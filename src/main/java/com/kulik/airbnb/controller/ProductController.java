@@ -56,7 +56,6 @@ public class ProductController {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         String productUserEmail = productDao.getUserEmailByProductId(productDto.getId());
 
-        System.out.println(authenticatedUserEmail + " " + productUserEmail);
         if (authenticatedUserEmail.equals(productUserEmail)) {
             return productDao.update(productDto);
         } else {
