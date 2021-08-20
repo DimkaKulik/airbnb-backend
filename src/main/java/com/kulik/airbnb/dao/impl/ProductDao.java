@@ -4,7 +4,6 @@ import com.kulik.airbnb.dao.Dao;
 import com.kulik.airbnb.dao.dto.ProductDto;
 import com.kulik.airbnb.dao.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,11 +14,12 @@ import java.util.List;
 
 @Component
 public class ProductDao implements Dao<ProductDto> {
+
     private final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
             + "parking, pool, conditioner, extinguisher, smoke_detector, description) "
             + "VALUES (:users_id, :main_photo, :type, :full, :address, :wifi, :parking, "
             + ":pool, :conditioner, :extinguisher, :smoke_detector, :description)";
-    private final String SELECT_ALL_PRODUCTS = "SELECT * FROM products";
+    private final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
     private final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
     private final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
             "ON products.users_id = users.id WHERE products.id = (:product_id)";
@@ -41,7 +41,7 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public ProductDto get(Long id) {
+    public ProductDto getById(int id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue("id", id);
@@ -54,9 +54,13 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public List getAll() {
+    public List getPage(int limit, int offset) {
         try {
-            return jdbcTemplate.query(SELECT_ALL_PRODUCTS, new ProductMapper());
+            MapSqlParameterSource parameters = new MapSqlParameterSource()
+                    .addValue("limit", limit)
+                    .addValue("offset", offset);
+
+            return jdbcTemplate.query(SELECT_PRODUCTS_PAGE, parameters, new ProductMapper());
         } catch (Exception e) {
             return null;
         }
@@ -75,7 +79,7 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public Long create(ProductDto productDto) {
+    public int create(ProductDto productDto) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue("users_id", productDto.getUsersId())
@@ -94,16 +98,16 @@ public class ProductDao implements Dao<ProductDto> {
             final KeyHolder holder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(INSERT_PRODUCT, parameters, holder, new String[] {"id"});
-            return holder.getKey().longValue();
+            return holder.getKey().intValue();
         } catch (Exception e) {
-            return 0L;
+            return 0;
         }
     }
 
 
     @Override
     public int update(ProductDto productDto) {
-        //try {
+        try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", productDto.getId())
                 .addValue("users_id", productDto.getUsersId())
@@ -121,9 +125,9 @@ public class ProductDao implements Dao<ProductDto> {
                 .addValue("approved", productDto.getApproved());
 
             return jdbcTemplate.update(UPDATE_PRODUCT, parameters);
-        //} catch (Exception e) {
-         //   return 0;
-        //}
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override
