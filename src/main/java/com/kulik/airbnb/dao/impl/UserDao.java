@@ -20,7 +20,7 @@ public class UserDao implements Dao<UserDto> {
             + "show_email, password, role, description) "
             + "VALUES (:name, :birth_date, :gender, :avatar, :email, :show_email, "
             + ":password, :role, :description)";
-    private final String SELECT_ALL_USERS = "SELECT * FROM users";
+    private final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
     private final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
     private final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
@@ -41,7 +41,7 @@ public class UserDao implements Dao<UserDto> {
     }
 
     @Override
-    public UserDto get(Long id) {
+    public UserDto getById(int id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", id);
@@ -54,7 +54,7 @@ public class UserDao implements Dao<UserDto> {
     }
 
 
-    public UserDto get(String email) {
+    public UserDto getByEmail(String email) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("email", email);
@@ -67,16 +67,20 @@ public class UserDao implements Dao<UserDto> {
     }
 
     @Override
-    public List<UserDto> getAll() {
+    public List<UserDto> getPage(int limit, int offset) {
         try {
-            return jdbcTemplate.query(SELECT_ALL_USERS, new UserMapper());
+            MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("limit", limit)
+                .addValue("offset", offset);
+
+            return jdbcTemplate.query(SELECT_USERS_PAGE, parameters, new UserMapper());
         } catch (Exception e) {
             return null;
         }
     }
 
     @Override
-    public Long create(UserDto userDto) {
+    public int create(UserDto userDto) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue("name", userDto.getName())
@@ -91,9 +95,9 @@ public class UserDao implements Dao<UserDto> {
             final KeyHolder holder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(INSERT_USER, parameters, holder, new String[] {"id"});
-            return holder.getKey().longValue();
+            return holder.getKey().intValue();
         } catch (Exception e) {
-            return 0L;
+            return 0;
         }
     }
 
@@ -108,7 +112,8 @@ public class UserDao implements Dao<UserDto> {
                     .addValue("avatar", userDto.getAvatar())
                     .addValue("email", userDto.getEmail())
                     .addValue("show_email", userDto.getShowEmail())
-                    .addValue("password", passwordEncoder.encode(userDto.getPassword()))
+                    .addValue("password", userDto.getPassword() == null
+                            ? null : passwordEncoder.encode(userDto.getPassword()))
                     .addValue("role", userDto.getRole())
                     .addValue("description", userDto.getDescription());
 

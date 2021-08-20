@@ -1,48 +1,44 @@
 package com.kulik.airbnb.controller;
 
 import com.kulik.airbnb.dao.dto.UserDto;
-import com.kulik.airbnb.dao.impl.UserDao;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.kulik.airbnb.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/users")
 public class UserController {
 
-    private final UserDao userDao;
+    private final UserService userService;
 
-    UserController(UserDao userDao) {
-        this.userDao = userDao;
+    UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/users")
-    List<UserDto> getUsers() {
-        return userDao.getAll();
+    @GetMapping("/")
+    ResponseEntity<?> getUsers(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+        return userService.getPage(limit, offset);
     }
 
-    @GetMapping("/users/{id}")
-    UserDto getUsers(@PathVariable Long id) {
-        return userDao.get(id);
+    @GetMapping("/{id}")
+    ResponseEntity<?> getUsers(@PathVariable int id) {
+        return userService.get(id);
     }
 
-    @PatchMapping("/users")
-    int updateUser(@RequestBody UserDto updatedUserDto) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        UserDto authenticatedUserDto = userDao.get(email);
-
-        updatedUserDto.setId(authenticatedUserDto.getId());
-        updatedUserDto.setRole(authenticatedUserDto.getRole());
-
-        return userDao.update(updatedUserDto);
+    @PatchMapping("/")
+    ResponseEntity<?> updateUser(@RequestBody UserDto updatedUserDto) {
+        return userService.updateUser(updatedUserDto);
     }
 
-    @DeleteMapping("/users")
-    int deleteUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userDao.deleteByEmail(email);
+    /*
+
+    TODO: make user account disable
+
+    @DeleteMapping("/")
+    ResponseEntity<?> deleteUser() {
+        return userService.deleteUser();
     }
+     */
+
 }

@@ -3,11 +3,11 @@ package com.kulik.airbnb.dao;
 import java.util.List;
 
 public interface Dao<T> {
-    T get(Long id);
+    List<T> getPage(int limit, int offset);
 
-    List<T> getAll();
+    T getById(int id);
 
-    Long create(T t);
+    int create(T t);
 
     int update(T t);
 
