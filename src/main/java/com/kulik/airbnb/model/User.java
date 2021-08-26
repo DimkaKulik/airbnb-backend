@@ -1,9 +1,10 @@
-package com.kulik.airbnb.dao.dto;
+package com.kulik.airbnb.model;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class UserDto {
+public class User {
+
     protected Long id;
     protected String name;
     protected Date birthDate;
@@ -13,13 +14,14 @@ public class UserDto {
     protected Boolean showEmail;
     protected String password;
     protected String role;
+    protected String origin;
     protected String description;
     protected Timestamp recordDate;
 
-    public UserDto(Long id, String name, Date birthDate, String gender,
-                   String avatar, String email, Boolean showEmail,
-                   String password, String role, String description,
-                   Timestamp recordDate) {
+    public User(Long id, String name, Date birthDate, String gender,
+                String avatar, String email, Boolean showEmail,
+                String password, String role, String origin, String description,
+                Timestamp recordDate) {
         this.id = id;
         this.name = name;
         this.birthDate = birthDate;
@@ -29,22 +31,24 @@ public class UserDto {
         this.showEmail = showEmail;
         this.password = password;
         this.role = role;
+        this.origin = origin;
         this.description = description;
         this.recordDate = recordDate;
     }
 
-    public UserDto(UserDto userDto) {
-        id = userDto.id;
-        name = userDto.name;
-        birthDate = userDto.birthDate;
-        gender = userDto.gender;
-        avatar = userDto.avatar;
-        email = userDto.email;
-        showEmail = userDto.showEmail;
-        password = userDto.password;
-        role = userDto.role;
-        description = userDto.description;
-        recordDate = userDto.recordDate;
+    public User(User user) {
+        id = user.id;
+        name = user.name;
+        birthDate = user.birthDate;
+        gender = user.gender;
+        avatar = user.avatar;
+        email = user.email;
+        showEmail = user.showEmail;
+        password = user.password;
+        role = user.role;
+        origin = user.origin;
+        description = user.description;
+        recordDate = user.recordDate;
     }
 
     public Long getId() {
@@ -95,6 +99,14 @@ public class UserDto {
         this.id = id;
     }
 
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -135,23 +147,5 @@ public class UserDto {
         this.showEmail = showEmail;
     }
 
-    public void fixNullFields() {
-        if (getGender() == null) {
-            setGender("unknown");
-        }
-        if (getShowEmail() == null) {
-            setShowEmail(true);
-        }
-        if (getPassword() == null) {
-            setPassword(generateSecurePassword());
-        }
-        if (getRole() == null) {
-            setRole("ROLE_USER");
-        }
-    }
-
-    String generateSecurePassword() {
-        return "11111";
-    }
 }
 

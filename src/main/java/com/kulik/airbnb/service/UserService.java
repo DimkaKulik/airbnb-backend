@@ -1,15 +1,13 @@
 package com.kulik.airbnb.service;
 
-import com.kulik.airbnb.dao.dto.UserDto;
+import com.kulik.airbnb.model.ServiceResponse;
+import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpTimeoutException;
 import java.util.List;
 
 @Service
@@ -22,52 +20,57 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public ResponseEntity<?> getPage(int limit, int offset) {
-        List<UserDto> users = userDao.getPage(limit, offset);
+    public ServiceResponse<?> getPage(int limit, int offset) {
+        List<User> users = userDao.getPage(limit, offset);
 
-        if (users != null) {
-            return ResponseEntity.ok(users);
+        if (users == null) {
+            return new ServiceResponse<>("Cannot extract users from DB", null);
         } else {
-            return new ResponseEntity<>("Cannot extract users from DB", HttpStatus.CONFLICT);
+            return new ServiceResponse<>("ok", users);
         }
     }
 
-    public ResponseEntity<?> get(int id) {
-        UserDto userDto = userDao.getById(id);
+    public ServiceResponse<?> get(int id) {
+        User user = userDao.getById(id);
 
-        if (userDto != null) {
-            return ResponseEntity.ok(userDto);
+        if (user == null) {
+            return new ServiceResponse<>("Cannot extract user from DB", null);
         } else {
-            return new ResponseEntity<>("Cannot extract user from DB", HttpStatus.CONFLICT);
+            return new ServiceResponse<>("ok", user);
         }
     }
 
-    public ResponseEntity<?> updateUser(@RequestBody UserDto updatedUserDto) {
+    public ServiceResponse<?> updateUser(@RequestBody User updatedUser) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserDto authenticatedUserDto = userDao.getByEmail(email);
+        User authenticatedUser = userDao.getByEmail(email);
 
-        updatedUserDto.setId(authenticatedUserDto.getId());
-        updatedUserDto.setRole(authenticatedUserDto.getRole());
+        updatedUser.setId(authenticatedUser.getId());
+        updatedUser.setRole(authenticatedUser.getRole());
 
-        int status = userDao.update(updatedUserDto);
+        //restriction: avoid non-native users to update password
+        if (!authenticatedUser.getOrigin().equals("native")) {
+            updatedUser.setPassword(null);
+        }
+
+        int status = userDao.update(updatedUser);
 
         if (status > 0) {
-            return ResponseEntity.ok(status);
+            return new ServiceResponse<>("ok", status);
         } else {
-            return new ResponseEntity<>("Cannot update user", HttpStatus.CONFLICT);
+            return new ServiceResponse<>("Cannot update user", null);
         }
     }
 
 
-    public ResponseEntity<?> deleteUser() {
+    public ServiceResponse<?> deleteUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         int status = userDao.deleteByEmail(email);
 
         if (status > 0) {
-            return ResponseEntity.ok(status);
+            return new ServiceResponse<>("ok", status);
         } else {
-            return new ResponseEntity<>("Cannot delete user", HttpStatus.CONFLICT);
+            return new ServiceResponse<>("Cannot delete user", null);
         }
     }
 

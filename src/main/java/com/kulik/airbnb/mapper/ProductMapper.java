@@ -1,7 +1,6 @@
-package com.kulik.airbnb.dao.mapper;
+package com.kulik.airbnb.mapper;
 
-import com.kulik.airbnb.dao.dto.ProductDto;
-import com.kulik.airbnb.dao.dto.UserDto;
+import com.kulik.airbnb.model.Product;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -11,7 +10,7 @@ public class ProductMapper implements RowMapper {
 
     @Override
     public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-        ProductDto productDto = new ProductDto(
+        Product product = new Product(
                 resultSet.getLong("id"),
                 resultSet.getLong("users_id"),
                 resultSet.getString("main_photo"),
@@ -28,6 +27,6 @@ public class ProductMapper implements RowMapper {
                 resultSet.getBoolean("approved")
         );
 
-        return productDto;
+        return product;
     }
 }
