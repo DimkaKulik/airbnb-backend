@@ -134,5 +134,24 @@ public class UserDto {
     public void setShowEmail(Boolean showEmail) {
         this.showEmail = showEmail;
     }
+
+    public void fixNullFields() {
+        if (getGender() == null) {
+            setGender("unknown");
+        }
+        if (getShowEmail() == null) {
+            setShowEmail(true);
+        }
+        if (getPassword() == null) {
+            setPassword(generateSecurePassword());
+        }
+        if (getRole() == null) {
+            setRole("ROLE_USER");
+        }
+    }
+
+    String generateSecurePassword() {
+        return "11111";
+    }
 }
 
