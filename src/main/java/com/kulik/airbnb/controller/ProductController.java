@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @CrossOrigin
 @RestController
@@ -21,39 +23,63 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     ResponseEntity<?> getProductsPage(@RequestParam(value = "limit", required = false, defaultValue = "100") int limit,
                                       @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
-        ServiceResponse response = productService.getProductsPage(limit, offset);
+        List<Product> productsPage = productService.getProductsPage(limit, offset);
 
-        return ServiceResponse.returnResponseEntity(response);
+        if (productsPage != null) {
+            return ResponseEntity.ok(productsPage);
+        } else {
+            return new ResponseEntity<>("Cannot get products page", HttpStatus.FORBIDDEN);
+        }
     }
 
     @GetMapping("/{id}")
     ResponseEntity<?> getProductById(@PathVariable int id) {
-        ServiceResponse response = productService.getProductById(id);
+        Product product = productService.getProductById(id);
 
-        return ServiceResponse.returnResponseEntity(response);
+        if (product != null) {
+            return ResponseEntity.ok(product);
+        } else {
+            return new ResponseEntity<>("Cannot get product", HttpStatus.FORBIDDEN);
+        }
     }
 
-    @PostMapping("/")
+    @PostMapping
     ResponseEntity<?> createProduct(@RequestBody Product product) {
-        ServiceResponse response = productService.createProduct(product);
+        int status = productService.createProduct(product);
 
-        return ServiceResponse.returnResponseEntity(response);
+        if (status > 0) {
+            return ResponseEntity.ok(status);
+        } else {
+            return new ResponseEntity<>("Cannot register user", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PatchMapping("/")
+    @PatchMapping
     ResponseEntity<?> updateProduct(@RequestBody Product product) {
-        ServiceResponse response = productService.updateProduct(product);
+        int status = productService.updateProduct(product);
 
-        return ServiceResponse.returnResponseEntity(response);
+        if (status > 0) {
+            return ResponseEntity.ok(status);
+        } else if (status == 0) {
+            return new ResponseEntity<>("Cannot update user", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>("You are not allowed to do this operation", HttpStatus.FORBIDDEN);
+        }
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping
     ResponseEntity<?> deleteProduct(@RequestBody Product product) {
-        ServiceResponse response = productService.deleteProduct(product);
+        int status = productService.deleteProduct(product);
 
-        return ServiceResponse.returnResponseEntity(response);
+        if (status > 0) {
+            return ResponseEntity.ok(status);
+        } else if (status == 0) {
+            return new ResponseEntity<>("Cannot delete user", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>("You are not allowed to do this operation", HttpStatus.FORBIDDEN);
+        }
     }
 }

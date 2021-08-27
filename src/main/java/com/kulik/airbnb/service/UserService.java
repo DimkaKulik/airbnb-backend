@@ -20,58 +20,34 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public ServiceResponse<?> getPage(int limit, int offset) {
+    public List<User> getPage(int limit, int offset) {
         List<User> users = userDao.getPage(limit, offset);
-
-        if (users == null) {
-            return new ServiceResponse<>("Cannot extract users from DB", null);
-        } else {
-            return new ServiceResponse<>("ok", users);
-        }
+        return users;
     }
 
-    public ServiceResponse<?> get(int id) {
+    public User get(int id) {
         User user = userDao.getById(id);
-
-        if (user == null) {
-            return new ServiceResponse<>("Cannot extract user from DB", null);
-        } else {
-            return new ServiceResponse<>("ok", user);
-        }
+        return user;
     }
 
-    public ServiceResponse<?> updateUser(@RequestBody User updatedUser) {
+    public int updateUser(@RequestBody User updatedUser) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User authenticatedUser = userDao.getByEmail(email);
 
         updatedUser.setId(authenticatedUser.getId());
-        updatedUser.setRole(authenticatedUser.getRole());
-
-        //restriction: avoid non-native users to update password
-        if (!authenticatedUser.getOrigin().equals("native")) {
-            updatedUser.setPassword(null);
-        }
 
         int status = userDao.update(updatedUser);
 
-        if (status > 0) {
-            return new ServiceResponse<>("ok", status);
-        } else {
-            return new ServiceResponse<>("Cannot update user", null);
-        }
+        return status;
     }
 
 
-    public ServiceResponse<?> deleteUser() {
+    public int deleteUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         int status = userDao.deleteByEmail(email);
 
-        if (status > 0) {
-            return new ServiceResponse<>("ok", status);
-        } else {
-            return new ServiceResponse<>("Cannot delete user", null);
-        }
+        return status;
     }
 
 }

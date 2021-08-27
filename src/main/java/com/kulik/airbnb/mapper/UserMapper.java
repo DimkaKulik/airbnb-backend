@@ -19,7 +19,6 @@ public class UserMapper implements RowMapper {
                 resultSet.getBoolean("show_email"),
                 resultSet.getString("password"),
                 resultSet.getString("role"),
-                resultSet.getString("origin"),
                 resultSet.getString("description"),
                 resultSet.getTimestamp("record_date")
         );

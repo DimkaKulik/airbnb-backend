@@ -17,9 +17,9 @@ import java.util.List;
 @Component
 public class UserDao implements Dao<User> {
     private final String INSERT_USER = "INSERT INTO users (name, birth_date, gender, avatar, email, "
-            + "show_email, password, role, origin, description) "
+            + "show_email, password, description) "
             + "VALUES (:name, :birth_date, :gender, :avatar, :email, :show_email, "
-            + ":password, :role, :origin, :description)";
+            + ":password, :description)";
     private final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
     private final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
@@ -28,7 +28,7 @@ public class UserDao implements Dao<User> {
     private final String UPDATE_USER = "UPDATE users SET "
             + "name = IFNULL(:name, name) , birth_date = IFNULL(:birth_date, birth_date), gender = IFNULL(:gender, gender), "
             + "avatar = IFNULL(:avatar, avatar), email = IFNULL(:email, email), show_email = IFNULL(:show_email, show_email), "
-            + "password = IFNULL(:password, password), role = IFNULL(:role, role), description = IFNULL(:description, description) "
+            + "password = IFNULL(:password, password), description = IFNULL(:description, description) "
             + "WHERE id = :id";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -89,9 +89,8 @@ public class UserDao implements Dao<User> {
                     .addValue("avatar", user.getAvatar())
                     .addValue("email", user.getEmail())
                     .addValue("show_email", user.getShowEmail())
-                    .addValue("password", passwordEncoder.encode(user.getPassword()))
-                    .addValue("role", user.getRole())
-                    .addValue("origin", user.getOrigin())
+                    .addValue("password", user.getPassword() == null
+                            ? null : passwordEncoder.encode(user.getPassword()))
                     .addValue("description", user.getDescription());
             final KeyHolder holder = new GeneratedKeyHolder();
 
@@ -115,7 +114,6 @@ public class UserDao implements Dao<User> {
                     .addValue("show_email", user.getShowEmail())
                     .addValue("password", user.getPassword() == null
                             ? null : passwordEncoder.encode(user.getPassword()))
-                    .addValue("role", user.getRole())
                     .addValue("description", user.getDescription());
 
             return jdbcTemplate.update(UPDATE_USER, parameters);

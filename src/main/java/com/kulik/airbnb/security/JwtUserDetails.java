@@ -14,8 +14,8 @@ public class JwtUserDetails extends User implements UserDetails {
 
     public JwtUserDetails(Long id, String name, Date birthDate, String gender,
                           String avatar, String email, Boolean showEmail, String password,
-                          String role, String origin, String description, Timestamp recordDate) {
-        super(id, name, birthDate, gender, avatar, email, showEmail, password, role, origin, description, recordDate);
+                          String role, String description, Timestamp recordDate) {
+        super(id, name, birthDate, gender, avatar, email, showEmail, password, role, description, recordDate);
     }
 
     public JwtUserDetails(User user) {

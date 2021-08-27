@@ -14,13 +14,12 @@ public class User {
     protected Boolean showEmail;
     protected String password;
     protected String role;
-    protected String origin;
     protected String description;
     protected Timestamp recordDate;
 
     public User(Long id, String name, Date birthDate, String gender,
                 String avatar, String email, Boolean showEmail,
-                String password, String role, String origin, String description,
+                String password, String role, String description,
                 Timestamp recordDate) {
         this.id = id;
         this.name = name;
@@ -31,7 +30,6 @@ public class User {
         this.showEmail = showEmail;
         this.password = password;
         this.role = role;
-        this.origin = origin;
         this.description = description;
         this.recordDate = recordDate;
     }
@@ -46,7 +44,6 @@ public class User {
         showEmail = user.showEmail;
         password = user.password;
         role = user.role;
-        origin = user.origin;
         description = user.description;
         recordDate = user.recordDate;
     }
@@ -97,14 +94,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getOrigin() {
-        return origin;
     }
 
     public void setName(String name) {

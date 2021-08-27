@@ -3,9 +3,12 @@ package com.kulik.airbnb.controller;
 import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.service.UserService;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -19,21 +22,36 @@ public class UserController {
     }
 
     @GetMapping("/")
-    ResponseEntity<?> getUsers(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
-        ServiceResponse response = userService.getPage(limit, offset);
-        return ServiceResponse.returnResponseEntity(response);
+    ResponseEntity<?> getUsersPage(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+        List<User> users = userService.getPage(limit, offset);
+
+        if (users != null) {
+            return ResponseEntity.ok(users);
+        } else {
+            return new ResponseEntity<>("Cannot get users page", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getUsers(@PathVariable int id) {
-        ServiceResponse response = userService.get(id);
-        return ServiceResponse.returnResponseEntity(response);
+    ResponseEntity<?> getUser(@PathVariable int id) {
+        User user = userService.get(id);
+
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return new ResponseEntity<>("Cannot get user", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PatchMapping("/")
     ResponseEntity<?> updateUser(@RequestBody User updatedUser) {
-        ServiceResponse response = userService.updateUser(updatedUser);
-        return ServiceResponse.returnResponseEntity(response);
+        int status = userService.updateUser(updatedUser);
+
+        if (status > 0) {
+            return ResponseEntity.ok(status);
+        } else {
+            return new ResponseEntity<>("Cannot update user", HttpStatus.FORBIDDEN);
+        }
     }
 
     /*

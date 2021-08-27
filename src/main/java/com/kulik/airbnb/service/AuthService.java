@@ -8,7 +8,9 @@ import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,61 +31,53 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public ServiceResponse<?> authenticate(AuthRequest request) {
+    public String authenticate(AuthRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-
             String token = jwtTokenProvider.createToken(request.getEmail());
 
-            return new ServiceResponse<String>("ok", token);
+            return token;
         } catch (AuthenticationException e) {
-            return new ServiceResponse<>("Cannot authenticate user: invalid login or password", null);
+            return null;
         }
     }
 
-    public ServiceResponse<?> register(User user) {
-        user.setRole("ROLE_USER");
-        if (user.getOrigin() == null) {
-            user.setOrigin("native");
-        }
+    public String register(User user) {
+        int status = 0;
 
-        int status = userDao.create(user);
+        if (user.getPassword() != null) {
+            status = userDao.create(user);
+        }
 
         if (status > 0) {
             return authenticate(new AuthRequest(user.getEmail(), user.getPassword()));
         } else {
-            return new ServiceResponse<>("Cannot register user", null);
+            return null;
         }
     }
 
-    public void logout() {
+    public void logout() { }
 
-    }
-
-    public ServiceResponse<?> loginOrRegisterViaGoogle(String authorizationCode) throws IOException {
+    public String loginOrRegisterViaGoogle(String authorizationCode) throws IOException {
         User userFromGoogle = googleOAuthClient.getUser(authorizationCode);
         User userFromDatabase = userDao.getByEmail(userFromGoogle.getEmail());
 
+        int status = 0;
         if (userFromDatabase == null) {
-            if (userFromGoogle.getGender() == null) {
-                userFromGoogle.setGender("unknown");
-            }
-            if (userFromGoogle.getShowEmail() == null) {
-                userFromGoogle.setShowEmail(true);
-            }
-            if (userFromGoogle.getPassword() == null) {
-                userFromGoogle.setPassword(GOOGLE_USER_PASSWORD);
-            }
-            if (userFromGoogle.getRole() == null) {
-                userFromGoogle.setRole("ROLE_USER");
-            }
-            if (userFromGoogle.getOrigin() == null) {
-                userFromGoogle.setOrigin("google");
-            }
-            return register(userFromGoogle);
+            status = userDao.create(userFromGoogle);
         } else {
-            return authenticate(new AuthRequest(userFromDatabase.getEmail(), GOOGLE_USER_PASSWORD));
+            status = 1;
+        }
+
+        if (status > 0) {
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userFromDatabase.getEmail(), null));
+
+            String token = jwtTokenProvider.createToken(userFromGoogle.getEmail());
+
+            return token;
+        } else {
+            return null;
         }
     }
 

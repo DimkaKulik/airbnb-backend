@@ -15,17 +15,17 @@ import java.util.List;
 @Component
 public class ProductDao implements Dao<Product> {
 
-    private final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
+    private static final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
             + "parking, pool, conditioner, extinguisher, smoke_detector, description) "
             + "VALUES (:users_id, :main_photo, :type, :full, :address, :wifi, :parking, "
             + ":pool, :conditioner, :extinguisher, :smoke_detector, :description)";
-    private final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
-    private final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
-    private final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
+    private static final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
+    private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
+    private static final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
             "ON products.users_id = users.id WHERE products.id = (:product_id)";
     //TODO: select product by host email
-    private final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
-    private final String UPDATE_PRODUCT = "UPDATE products SET "
+    private static final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
+    private static final String UPDATE_PRODUCT = "UPDATE products SET "
             + "users_id = IFNULL(:users_id, users_id), main_photo = IFNULL(:main_photo, main_photo), "
             + "type = IFNULL(:type, type), full = IFNULL(:full, full), "
             + "address = IFNULL(:address, address), parking = IFNULL(:parking, parking), pool = IFNULL(:pool, pool), "

@@ -17,21 +17,21 @@ import java.util.Date;
 @Component
 public class GoogleOAuthClient {
 
-    private final String FIELDS = "names,emailAddresses,genders,birthdays,photos";
+    private static final String FIELDS = "names,emailAddresses,genders,birthdays,photos";
 
     @Value("${google.client_id}")
-    String CLIENT_ID;
+    String clientId;
 
     @Value("${google.client_secret}")
-    String CLIENT_SECRET;
+    String clientSecret;
 
     @Value("${google.redirect_uri}")
-    String REDIRECT_URI;
+    String redirectUri;
 
     public User getUser(String authorizationCode) throws IOException {
         GoogleTokenResponse response =
                 new GoogleAuthorizationCodeTokenRequest(new NetHttpTransport(), new GsonFactory(),
-                        CLIENT_ID, CLIENT_SECRET, authorizationCode, REDIRECT_URI)
+                        clientId, clientSecret, authorizationCode, redirectUri)
                         .execute();
 
         GoogleCredential credential = new GoogleCredential();
@@ -52,10 +52,10 @@ public class GoogleOAuthClient {
                         new Date(profile.getBirthdays().get(0).getDate().getYear() - 1900,
                                 profile.getBirthdays().get(0).getDate().getMonth() - 1,
                                 profile.getBirthdays().get(0).getDate().getDay()),
-                profile.getGenders() == null ? null : profile.getGenders().get(0).getValue(),
+                profile.getGenders() == null ? "unknown" : profile.getGenders().get(0).getValue(),
                 profile.getPhotos() == null ? null : profile.getPhotos().get(0).getUrl(),
                 profile.getEmailAddresses() == null ? null : profile.getEmailAddresses().get(0).getValue(),
-                null, null, null, null, null, null);
+                true, null, null, null, null);
 
         return user;
     }

@@ -26,34 +26,35 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        ServiceResponse<?> response = authService.authenticate(request);
+        System.out.println("here login");
+        String token = authService.authenticate(request);
 
-        if (response.getMessage().equals("ok")) {
-            return ResponseEntity.ok(response.getBody());
+        if (token != null) {
+            return ResponseEntity.ok(token);
         } else {
-            return new ResponseEntity<>(response.getMessage(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Invalid login/password combination", HttpStatus.FORBIDDEN);
         }
     }
 
     @PostMapping("/login/google")
     ResponseEntity<?> loginOrRegister(@RequestBody Map<String, String> body) throws IOException {
-        ServiceResponse<?> response = authService.loginOrRegisterViaGoogle(body.get("code"));
+        String token = authService.loginOrRegisterViaGoogle(body.get("code"));
 
-        if (response.getMessage().equals("ok")) {
-            return ResponseEntity.ok(response.getBody());
+        if (token != null) {
+            return ResponseEntity.ok(token);
         } else {
-            return new ResponseEntity<>(response.getMessage(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Cannot authorize user", HttpStatus.FORBIDDEN);
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        ServiceResponse<?> response = authService.register(user);
+        String token = authService.register(user);
 
-        if (response.getMessage().equals("ok")) {
-            return ResponseEntity.ok(response.getBody());
+        if (token != null) {
+            return ResponseEntity.ok(token);
         } else {
-            return new ResponseEntity<>(response.getMessage(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Cannot register user", HttpStatus.FORBIDDEN);
         }
     }
 
