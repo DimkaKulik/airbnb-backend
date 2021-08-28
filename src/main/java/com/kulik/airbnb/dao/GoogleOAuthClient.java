@@ -1,5 +1,7 @@
 package com.kulik.airbnb.dao;
 
+import com.google.api.client.auth.oauth2.BearerToken;
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
@@ -7,6 +9,9 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.Person;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.UserCredentials;
 import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,7 +41,7 @@ public class GoogleOAuthClient {
                         clientId, clientSecret, authorizationCode, redirectUri)
                         .execute();
 
-        GoogleCredential credential = new GoogleCredential();
+        Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod());
         credential.setAccessToken(response.getAccessToken());
 
         PeopleService peopleService = new PeopleService(new NetHttpTransport(),
