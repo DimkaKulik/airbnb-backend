@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 @Component
 public class GoogleOAuthClient {
@@ -49,7 +51,8 @@ public class GoogleOAuthClient {
         User user =  new User(null,
                 profile.getNames() == null ? null : profile.getNames().get(0).getGivenName(),
                 profile.getBirthdays() == null ? null :
-                        new Date(profile.getBirthdays().get(0).getDate().getYear() - 1900,
+                        new GregorianCalendar(
+                                profile.getBirthdays().get(0).getDate().getYear(),
                                 profile.getBirthdays().get(0).getDate().getMonth() - 1,
                                 profile.getBirthdays().get(0).getDate().getDay()),
                 profile.getGenders() == null ? "unknown" : profile.getGenders().get(0).getValue(),

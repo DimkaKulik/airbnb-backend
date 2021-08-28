@@ -71,8 +71,8 @@ public class AuthService {
         }
 
         if (status > 0) {
-            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userFromDatabase.getEmail(), null));
-
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userFromGoogle.getEmail(), ""));
             String token = jwtTokenProvider.createToken(userFromGoogle.getEmail());
 
             return token;

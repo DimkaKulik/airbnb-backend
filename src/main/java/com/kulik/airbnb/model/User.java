@@ -2,12 +2,13 @@ package com.kulik.airbnb.model;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class User {
 
     protected Long id;
     protected String name;
-    protected Date birthDate;
+    protected GregorianCalendar birthDate;
     protected String gender;
     protected String avatar;
     protected String email;
@@ -17,7 +18,7 @@ public class User {
     protected String description;
     protected Timestamp recordDate;
 
-    public User(Long id, String name, Date birthDate, String gender,
+    public User(Long id, String name, GregorianCalendar birthDate, String gender,
                 String avatar, String email, Boolean showEmail,
                 String password, String role, String description,
                 Timestamp recordDate) {
@@ -76,7 +77,7 @@ public class User {
         return showEmail;
     }
 
-    public Date getBirthDate() {
+    public GregorianCalendar getBirthDate() {
         return birthDate;
     }
 
@@ -120,7 +121,7 @@ public class User {
         this.avatar = avatar;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(GregorianCalendar birthDate) {
         this.birthDate = birthDate;
     }
 
