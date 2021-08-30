@@ -1,8 +1,6 @@
-package com.kulik.airbnb.dao.dto;
+package com.kulik.airbnb.model;
 
-import com.kulik.airbnb.dao.impl.ProductDao;
-
-public class ProductDto {
+public class Product {
     protected Long id;
     protected Long usersId;
     protected String mainPhoto;
@@ -18,10 +16,10 @@ public class ProductDto {
     protected String description;
     protected Boolean approved;
 
-    public ProductDto(Long id, Long usersId, String mainPhoto, String type, Boolean full,
-                      String address, Boolean wifi, Boolean parking, Boolean pool,
-                      Boolean conditioner, Boolean extinguisher, Boolean smokeDetector,
-                      String description, Boolean approved) {
+    public Product(Long id, Long usersId, String mainPhoto, String type, Boolean full,
+                   String address, Boolean wifi, Boolean parking, Boolean pool,
+                   Boolean conditioner, Boolean extinguisher, Boolean smokeDetector,
+                   String description, Boolean approved) {
         this.id = id;
         this.usersId = usersId;
         this.mainPhoto = mainPhoto;
@@ -38,21 +36,21 @@ public class ProductDto {
         this.approved = approved;
     }
 
-    public ProductDto(ProductDto productDto) {
-        id = productDto.id;
-        usersId = productDto.usersId;
-        mainPhoto = productDto.mainPhoto;
-        type = productDto.type;
-        full = productDto.full;
-        address = productDto.address;
-        wifi = productDto.wifi;
-        parking = productDto.parking;
-        pool = productDto.pool;
-        conditioner = productDto.conditioner;
-        extinguisher = productDto.extinguisher;
-        smokeDetector = productDto.smokeDetector;
-        description = productDto.description;
-        approved = productDto.approved;
+    public Product(Product product) {
+        id = product.id;
+        usersId = product.usersId;
+        mainPhoto = product.mainPhoto;
+        type = product.type;
+        full = product.full;
+        address = product.address;
+        wifi = product.wifi;
+        parking = product.parking;
+        pool = product.pool;
+        conditioner = product.conditioner;
+        extinguisher = product.extinguisher;
+        smokeDetector = product.smokeDetector;
+        description = product.description;
+        approved = product.approved;
     }
 
 

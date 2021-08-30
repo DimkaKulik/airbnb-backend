@@ -1,12 +1,10 @@
-package com.kulik.airbnb.dao.dto;
+package com.kulik.airbnb.model;
 
-import com.kulik.airbnb.controller.AuthController;
-
-public class AuthRequestDto {
+public class AuthRequest {
     private String email;
     private String password;
 
-    public AuthRequestDto(String email, String password) {
+    public AuthRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }

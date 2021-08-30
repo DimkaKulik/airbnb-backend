@@ -1,11 +1,9 @@
 package com.kulik.airbnb.service;
 
-import com.kulik.airbnb.dao.dto.ProductDto;
-import com.kulik.airbnb.dao.dto.UserDto;
+import com.kulik.airbnb.model.Product;
+import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.ProductDao;
 import com.kulik.airbnb.dao.impl.UserDao;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -22,72 +20,59 @@ public class ProductService {
         this.productDao = productDao;
     }
 
-    public ResponseEntity<?> getProductsPage(int limit, int offset) {
+    public List<Product> getProductsPage(int limit, int offset) {
         if (limit > 100) {
             limit = 100;
         }
 
-        List<ProductDto> allProducts = productDao.getPage(limit, offset);
+        List<Product> allProducts = productDao.getPage(limit, offset);
 
-        if (allProducts != null) {
-            return ResponseEntity.ok(allProducts);
-        } else {
-            return new ResponseEntity<>("Something went wrong, cannot extract products from DB", HttpStatus.CONFLICT);
-        }
+        return allProducts;
     }
 
-    public ResponseEntity<?> getProductById(int id) {
-        ProductDto productDto = productDao.getById(id);
+    public Product getProductById(int id) {
+        Product product = productDao.getById(id);
 
-        if (productDto != null) {
-            return ResponseEntity.ok(productDto);
-        } else {
-            return new ResponseEntity<>("No user with such id", HttpStatus.CONFLICT);
-        }
+        return product;
     }
 
-    public ResponseEntity<?> createProduct(ProductDto productDto) {
+    public int createProduct(Product product) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserDto authenticatedUserDto = userDao.getByEmail(authenticatedUserEmail);
+        User authenticatedUser = userDao.getByEmail(authenticatedUserEmail);
 
-        productDto.setApproved(false);
-        productDto.setUsersId(authenticatedUserDto.getId());
+        product.setApproved(false);
+        product.setUsersId(authenticatedUser.getId());
 
-        int status = productDao.create(productDto);
+        int status = productDao.create(product);
 
-        if (status > 0) {
-            return ResponseEntity.ok(status);
-        } else {
-            return new ResponseEntity<>("Something went wrong, cannot add new product into db", HttpStatus.CONFLICT);
-        }
+        return status;
     }
 
-    public ResponseEntity<?> updateProduct(ProductDto productDto) {
-        productDto.setApproved(null);
-        productDto.setUsersId(null);
+    public int updateProduct(Product product) {
+        product.setApproved(null);
+        product.setUsersId(null);
 
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        String productUserEmail = productDao.getUserEmailByProductId(productDto.getId());
+        String productUserEmail = productDao.getUserEmailByProductId(product.getId());
 
         if (authenticatedUserEmail.equals(productUserEmail)) {
-            int status = productDao.update(productDto);
-            return status == 0 ? new ResponseEntity<>("Cannot update product", HttpStatus.CONFLICT)
-                    : ResponseEntity.ok(status);
+            int status = productDao.update(product);
+
+            return status;
         } else {
-            return new ResponseEntity<>("No rights to update product", HttpStatus.FORBIDDEN);
+            return -1;
         }
     }
 
-    public ResponseEntity<?> deleteProduct(ProductDto productDto) {
+    public int deleteProduct(Product product) {
         String authenticatedUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        String productUserEmail = productDao.getUserEmailByProductId(productDto.getId());
+        String productUserEmail = productDao.getUserEmailByProductId(product.getId());
 
         if (authenticatedUserEmail.equals(productUserEmail)) {
-            int status = productDao.delete(productDto);
-            return status == 0 ? new ResponseEntity<>("Cannot delete product", HttpStatus.CONFLICT)
-                    : ResponseEntity.ok(status);
+            int status = productDao.delete(product);
+            return status;
         } else {
-            return new ResponseEntity<>("No rights to delete product", HttpStatus.FORBIDDEN);
+            return -1;
         }
     }
 }

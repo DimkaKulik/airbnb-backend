@@ -1,8 +1,8 @@
 package com.kulik.airbnb.dao.impl;
 
 import com.kulik.airbnb.dao.Dao;
-import com.kulik.airbnb.dao.dto.ProductDto;
-import com.kulik.airbnb.dao.mapper.ProductMapper;
+import com.kulik.airbnb.model.Product;
+import com.kulik.airbnb.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -13,19 +13,19 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ProductDao implements Dao<ProductDto> {
+public class ProductDao implements Dao<Product> {
 
-    private final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
+    private static final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
             + "parking, pool, conditioner, extinguisher, smoke_detector, description) "
             + "VALUES (:users_id, :main_photo, :type, :full, :address, :wifi, :parking, "
             + ":pool, :conditioner, :extinguisher, :smoke_detector, :description)";
-    private final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
-    private final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
-    private final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
+    private static final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
+    private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
+    private static final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
             "ON products.users_id = users.id WHERE products.id = (:product_id)";
     //TODO: select product by host email
-    private final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
-    private final String UPDATE_PRODUCT = "UPDATE products SET "
+    private static final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
+    private static final String UPDATE_PRODUCT = "UPDATE products SET "
             + "users_id = IFNULL(:users_id, users_id), main_photo = IFNULL(:main_photo, main_photo), "
             + "type = IFNULL(:type, type), full = IFNULL(:full, full), "
             + "address = IFNULL(:address, address), parking = IFNULL(:parking, parking), pool = IFNULL(:pool, pool), "
@@ -41,12 +41,12 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public ProductDto getById(int id) {
+    public Product getById(int id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue("id", id);
 
-            return (ProductDto) jdbcTemplate.queryForObject(SELECT_PRODUCT_BY_ID,
+            return (Product) jdbcTemplate.queryForObject(SELECT_PRODUCT_BY_ID,
                     parameters, new ProductMapper());
         } catch (Exception e) {
             return null;
@@ -79,22 +79,22 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public int create(ProductDto productDto) {
+    public int create(Product product) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                    .addValue("users_id", productDto.getUsersId())
-                    .addValue("main_photo", productDto.getMainPhoto())
-                    .addValue("type", productDto.getType())
-                    .addValue("full", productDto.getFull())
-                    .addValue("address", productDto.getAddress())
-                    .addValue("wifi", productDto.getWifi())
-                    .addValue("parking", productDto.getParking())
-                    .addValue("pool", productDto.getPool())
-                    .addValue("conditioner", productDto.getConditioner())
-                    .addValue("extinguisher", productDto.getExtinguisher())
-                    .addValue("smoke_detector", productDto.getSmokeDetector())
-                    .addValue("description", productDto.getDescription())
-                    .addValue("approved", productDto.getApproved());
+                    .addValue("users_id", product.getUsersId())
+                    .addValue("main_photo", product.getMainPhoto())
+                    .addValue("type", product.getType())
+                    .addValue("full", product.getFull())
+                    .addValue("address", product.getAddress())
+                    .addValue("wifi", product.getWifi())
+                    .addValue("parking", product.getParking())
+                    .addValue("pool", product.getPool())
+                    .addValue("conditioner", product.getConditioner())
+                    .addValue("extinguisher", product.getExtinguisher())
+                    .addValue("smoke_detector", product.getSmokeDetector())
+                    .addValue("description", product.getDescription())
+                    .addValue("approved", product.getApproved());
             final KeyHolder holder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(INSERT_PRODUCT, parameters, holder, new String[] {"id"});
@@ -106,23 +106,23 @@ public class ProductDao implements Dao<ProductDto> {
 
 
     @Override
-    public int update(ProductDto productDto) {
+    public int update(Product product) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", productDto.getId())
-                .addValue("users_id", productDto.getUsersId())
-                .addValue("main_photo", productDto.getMainPhoto())
-                .addValue("type", productDto.getType())
-                .addValue("full", productDto.getFull())
-                .addValue("address", productDto.getAddress())
-                .addValue("wifi", productDto.getWifi())
-                .addValue("parking", productDto.getParking())
-                .addValue("pool", productDto.getPool())
-                .addValue("conditioner", productDto.getConditioner())
-                .addValue("extinguisher", productDto.getExtinguisher())
-                .addValue("smoke_detector", productDto.getSmokeDetector())
-                .addValue("description", productDto.getDescription())
-                .addValue("approved", productDto.getApproved());
+                .addValue("id", product.getId())
+                .addValue("users_id", product.getUsersId())
+                .addValue("main_photo", product.getMainPhoto())
+                .addValue("type", product.getType())
+                .addValue("full", product.getFull())
+                .addValue("address", product.getAddress())
+                .addValue("wifi", product.getWifi())
+                .addValue("parking", product.getParking())
+                .addValue("pool", product.getPool())
+                .addValue("conditioner", product.getConditioner())
+                .addValue("extinguisher", product.getExtinguisher())
+                .addValue("smoke_detector", product.getSmokeDetector())
+                .addValue("description", product.getDescription())
+                .addValue("approved", product.getApproved());
 
             return jdbcTemplate.update(UPDATE_PRODUCT, parameters);
         } catch (Exception e) {
@@ -131,10 +131,10 @@ public class ProductDao implements Dao<ProductDto> {
     }
 
     @Override
-    public int delete(ProductDto productDto) {
+    public int delete(Product product) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                    .addValue("id", productDto.getId());
+                    .addValue("id", product.getId());
 
             return jdbcTemplate.update(DELETE_PRODUCT_BY_ID, parameters);
         } catch (Exception e) {

@@ -1,15 +1,12 @@
 package com.kulik.airbnb.service;
 
-import com.kulik.airbnb.dao.dto.UserDto;
+import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpTimeoutException;
 import java.util.List;
 
 @Service
@@ -22,53 +19,34 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public ResponseEntity<?> getPage(int limit, int offset) {
-        List<UserDto> users = userDao.getPage(limit, offset);
-
-        if (users != null) {
-            return ResponseEntity.ok(users);
-        } else {
-            return new ResponseEntity<>("Cannot extract users from DB", HttpStatus.CONFLICT);
-        }
+    public List<User> getPage(int limit, int offset) {
+        List<User> users = userDao.getPage(limit, offset);
+        return users;
     }
 
-    public ResponseEntity<?> get(int id) {
-        UserDto userDto = userDao.getById(id);
-
-        if (userDto != null) {
-            return ResponseEntity.ok(userDto);
-        } else {
-            return new ResponseEntity<>("Cannot extract user from DB", HttpStatus.CONFLICT);
-        }
+    public User get(int id) {
+        User user = userDao.getById(id);
+        return user;
     }
 
-    public ResponseEntity<?> updateUser(@RequestBody UserDto updatedUserDto) {
+    public int updateUser(@RequestBody User updatedUser) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserDto authenticatedUserDto = userDao.getByEmail(email);
+        User authenticatedUser = userDao.getByEmail(email);
 
-        updatedUserDto.setId(authenticatedUserDto.getId());
-        updatedUserDto.setRole(authenticatedUserDto.getRole());
+        updatedUser.setId(authenticatedUser.getId());
 
-        int status = userDao.update(updatedUserDto);
+        int status = userDao.update(updatedUser);
 
-        if (status > 0) {
-            return ResponseEntity.ok(status);
-        } else {
-            return new ResponseEntity<>("Cannot update user", HttpStatus.CONFLICT);
-        }
+        return status;
     }
 
 
-    public ResponseEntity<?> deleteUser() {
+    public int deleteUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         int status = userDao.deleteByEmail(email);
 
-        if (status > 0) {
-            return ResponseEntity.ok(status);
-        } else {
-            return new ResponseEntity<>("Cannot delete user", HttpStatus.CONFLICT);
-        }
+        return status;
     }
 
 }
