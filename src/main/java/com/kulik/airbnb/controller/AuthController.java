@@ -1,7 +1,6 @@
 package com.kulik.airbnb.controller;
 
 import com.kulik.airbnb.model.AuthRequest;
-import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.service.AuthService;
 import org.springframework.http.HttpStatus;

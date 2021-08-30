@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class JwtUserDetails extends User implements UserDetails {

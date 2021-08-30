@@ -1,7 +1,6 @@
 package com.kulik.airbnb.controller;
 
 import com.kulik.airbnb.model.Product;
-import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

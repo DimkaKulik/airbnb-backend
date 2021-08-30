@@ -1,9 +1,7 @@
 package com.kulik.airbnb.controller;
 
-import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.service.UserService;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

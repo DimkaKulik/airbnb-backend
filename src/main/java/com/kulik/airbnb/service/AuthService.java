@@ -2,13 +2,11 @@ package com.kulik.airbnb.service;
 
 import com.kulik.airbnb.dao.GoogleOAuthClient;
 import com.kulik.airbnb.model.AuthRequest;
-import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,8 +19,6 @@ public class AuthService {
     private final GoogleOAuthClient googleOAuthClient;
     private final UserDao userDao;
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final String GOOGLE_USER_PASSWORD = "google-user-password";
 
     public AuthService(AuthenticationManager authenticationManager, GoogleOAuthClient googleOAuthClient, UserDao userDao, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;

@@ -1,7 +1,6 @@
 package com.kulik.airbnb.service;
 
 import com.kulik.airbnb.model.Product;
-import com.kulik.airbnb.model.ServiceResponse;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.ProductDao;
 import com.kulik.airbnb.dao.impl.UserDao;

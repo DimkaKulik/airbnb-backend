@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 public class UserMapper implements RowMapper {
     @Override

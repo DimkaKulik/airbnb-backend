@@ -3,23 +3,17 @@ package com.kulik.airbnb.dao;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.Person;
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.UserCredentials;
 import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 @Component
 public class GoogleOAuthClient {
@@ -53,17 +47,29 @@ public class GoogleOAuthClient {
                 .setPersonFields(FIELDS)
                 .execute();
 
-        User user =  new User(null,
-                profile.getNames() == null ? null : profile.getNames().get(0).getGivenName(),
-                profile.getBirthdays() == null ? null :
-                        new GregorianCalendar(
-                                profile.getBirthdays().get(0).getDate().getYear(),
-                                profile.getBirthdays().get(0).getDate().getMonth() - 1,
-                                profile.getBirthdays().get(0).getDate().getDay()),
-                profile.getGenders() == null ? "unknown" : profile.getGenders().get(0).getValue(),
-                profile.getPhotos() == null ? null : profile.getPhotos().get(0).getUrl(),
-                profile.getEmailAddresses() == null ? null : profile.getEmailAddresses().get(0).getValue(),
-                true, null, null, null, null);
+        User user =  new User();
+
+        if (profile.getNames() != null) {
+            user.setName(profile.getNames().get(0).getGivenName());
+        }
+        if (profile.getBirthdays() != null) {
+            user.setBirthDate(new GregorianCalendar(
+                    profile.getBirthdays().get(0).getDate().getYear(),
+                    profile.getBirthdays().get(0).getDate().getMonth() - 1,
+                    profile.getBirthdays().get(0).getDate().getDay()));
+        }
+        if (profile.getGenders() != null) {
+            user.setGender(profile.getGenders().get(0).getValue());
+        } else {
+            user.setGender("unknown");
+        }
+        if (profile.getPhotos() != null) {
+            user.setAvatar(profile.getPhotos().get(0).getUrl());
+        }
+        if (profile.getEmailAddresses() != null) {
+            user.setEmail(profile.getEmailAddresses().get(0).getValue());
+        }
+        user.setShowEmail(true);
 
         return user;
     }
