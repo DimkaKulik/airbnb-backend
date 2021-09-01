@@ -5,6 +5,9 @@ import com.kulik.airbnb.model.AuthRequest;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -39,7 +42,7 @@ public class AuthService {
         }
     }
 
-    public String register(User user) {
+    public String register(User user) throws UnirestException {
         int status = 0;
 
         if (user.getPassword() != null) {
@@ -79,7 +82,15 @@ public class AuthService {
         }
     }
 
-    void sendConfirmationLink(String email) {
-        
+    String sendConfirmationLink(String email) throws UnirestException {
+        HttpResponse<String> request = Unirest.post("https://api.mailgun.net/v3/sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org/messages")
+			.basicAuth("api", "2a03404fdef9ef5e30423e69430bc346-156db0f1-76bec644")
+                .queryString("from", "Excited User <mailgun@sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org>")
+                .queryString("to", "kulik.antitu@gmail.com")
+                .queryString("subject", "TEST MAILGUN")
+                .queryString("text", "Testing message from mailgun")
+                .asString();
+        System.out.println(request.getBody());
+        return request.getBody();
     }
 }

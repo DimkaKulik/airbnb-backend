@@ -3,6 +3,7 @@ package com.kulik.airbnb.controller;
 import com.kulik.airbnb.model.AuthRequest;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.service.AuthService;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody User user) throws UnirestException {
         String token = authService.register(user);
 
         if (token != null) {
