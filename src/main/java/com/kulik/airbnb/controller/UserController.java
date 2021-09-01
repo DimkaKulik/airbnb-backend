@@ -19,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     ResponseEntity<?> getUsersPage(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
         List<User> users = userService.getPage(limit, offset);
 
@@ -41,7 +41,13 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/")
+    @GetMapping("/confirmation")
+    ResponseEntity<?> confirmUser(@RequestParam(value = "token", required = true) String token) {
+        userService.confirmUser(token);
+        return null;
+    }
+
+    @PatchMapping
     ResponseEntity<?> updateUser(@RequestBody User updatedUser) {
         int status = userService.updateUser(updatedUser);
 
@@ -51,6 +57,9 @@ public class UserController {
             return new ResponseEntity<>("Cannot update user", HttpStatus.FORBIDDEN);
         }
     }
+
+
+
 
     /*
 

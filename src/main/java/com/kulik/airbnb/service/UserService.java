@@ -29,6 +29,10 @@ public class UserService {
         return user;
     }
 
+    public String confirmUser(String token) {
+        return null;
+    }
+
     public int updateUser(@RequestBody User updatedUser) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 

@@ -31,7 +31,7 @@ public class AuthService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-            String token = jwtTokenProvider.createToken(request.getEmail());
+            String token = jwtTokenProvider.createAuthorizationToken(request.getEmail());
 
             return token;
         } catch (AuthenticationException e) {
@@ -69,7 +69,7 @@ public class AuthService {
         if (status > 0) {
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(userFromGoogle.getEmail(), ""));
-            String token = jwtTokenProvider.createToken(userFromGoogle.getEmail());
+            String token = jwtTokenProvider.createAuthorizationToken(userFromGoogle.getEmail());
 
             return token;
         } else {
