@@ -47,6 +47,7 @@ public class AuthService {
         }
 
         if (status > 0) {
+            sendConfirmationLink(user.getEmail());
             return authenticate(new AuthRequest(user.getEmail(), user.getPassword()));
         } else {
             return null;
@@ -62,6 +63,7 @@ public class AuthService {
         int status = 0;
         if (userFromDatabase == null) {
             status = userDao.create(userFromGoogle);
+            userDao.confirm(userFromGoogle.getEmail());
         } else {
             status = 1;
         }
@@ -77,4 +79,7 @@ public class AuthService {
         }
     }
 
+    void sendConfirmationLink(String email) {
+        
+    }
 }

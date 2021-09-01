@@ -16,20 +16,21 @@ import java.util.List;
 
 @Component
 public class UserDao implements Dao<User> {
-    private final String INSERT_USER = "INSERT INTO users (name, birth_date, gender, avatar, email, "
+    private static final String INSERT_USER = "INSERT INTO users (name, birth_date, gender, avatar, email, "
             + "show_email, password, description) "
             + "VALUES (:name, :birth_date, :gender, :avatar, :email, :show_email, "
             + ":password, :description)";
-    private final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
-    private final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
-    private final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
-    private final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
-    private final String DELETE_USER_BY_EMAIL = "DELETE FROM users WHERE email = (:email)";
-    private final String UPDATE_USER = "UPDATE users SET "
+    private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
+    private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
+    private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
+    private static final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
+    private static final String DELETE_USER_BY_EMAIL = "DELETE FROM users WHERE email = (:email)";
+    private static final String UPDATE_USER = "UPDATE users SET "
             + "name = IFNULL(:name, name) , birth_date = IFNULL(:birth_date, birth_date), gender = IFNULL(:gender, gender), "
             + "avatar = IFNULL(:avatar, avatar), email = IFNULL(:email, email), show_email = IFNULL(:show_email, show_email), "
             + "password = IFNULL(:password, password), description = IFNULL(:description, description) "
             + "WHERE id = :id";
+    private static final String CONFIRM_USER_ACCOUNT = "UPDATE users SET confirmed = true WHERE email = (:email)";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
@@ -143,5 +144,11 @@ public class UserDao implements Dao<User> {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public void confirm(String email) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("email", email);
+        jdbcTemplate.update(CONFIRM_USER_ACCOUNT, parameters);
     }
 }

@@ -43,8 +43,11 @@ public class UserController {
 
     @GetMapping("/confirmation")
     ResponseEntity<?> confirmUser(@RequestParam(value = "token", required = true) String token) {
-        userService.confirmUser(token);
-        return null;
+        try {
+            return ResponseEntity.ok(userService.confirmUser(token));
+        } catch(Exception e) {
+            return new ResponseEntity<>("Invalid confirmation link", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PatchMapping

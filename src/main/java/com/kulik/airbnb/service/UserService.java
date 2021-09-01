@@ -2,6 +2,7 @@ package com.kulik.airbnb.service;
 
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
+import com.kulik.airbnb.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import java.util.List;
 @Service
 public class UserService {
 
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserDao userDao;
 
     @Autowired
-    public UserService(UserDao userDao) {
+    public UserService(JwtTokenProvider jwtTokenProvider, UserDao userDao) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userDao = userDao;
     }
 
@@ -29,8 +32,13 @@ public class UserService {
         return user;
     }
 
-    public String confirmUser(String token) {
-        return null;
+    public String confirmUser(String token) throws Exception {
+        if (jwtTokenProvider.validateToken(token)) {
+            userDao.confirm(jwtTokenProvider.getUsername(token));
+            return "User successfully confirmed";
+        } else {
+            throw new Exception("invalid token");
+        }
     }
 
     public int updateUser(@RequestBody User updatedUser) {
