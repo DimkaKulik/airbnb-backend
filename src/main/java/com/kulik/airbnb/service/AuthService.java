@@ -48,11 +48,14 @@ public class AuthService {
         }
     }
 
-    public void register(User user) throws UnirestException {
-        if (user.getPassword() != null) {
-            userDao.create(user);
+    public void register(User user) throws Exception {
+        if (user.getPassword() == null) {
+            throw new Exception("Password cannot be null");
         }
-        sendConfirmationLink(user.getEmail());
+
+        if (userDao.create(user) > 0) {
+            sendConfirmationLink(user.getEmail());
+        }
     }
 
     public void logout() { }
@@ -82,18 +85,13 @@ public class AuthService {
 
     String sendConfirmationLink(String email) throws UnirestException {
         String confirmationLink = "http://localhost:8080/users/confirmation?token=" + jwtTokenProvider.createConfirmationToken(email);
-        System.out.println(confirmationLink);
-        /*
-        HttpResponse<String> request = Unirest.post("https://api.mailgun.net/v3/sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org/messages")
-			.basicAuth("api", "2a03404fdef9ef5e30423e69430bc346-156db0f1-76bec644")
-                .queryString("from", "Excited User <mailgun@sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org>")
+        HttpResponse<String> request = Unirest.post("https://api.mailgun.net/v3/sandbox18addbc31e5d4a68ada7e2b6b4dd4237.mailgun.org/messages")
+			.basicAuth("api", "026241369f0f732cf5e0dbee7086f904-156db0f1-26d8978b")
+                .queryString("from", "Excited User <dzmitser.kulik@gmail.com>")
                 .queryString("to", email)
                 .queryString("subject", "Email verification")
                 .queryString("text", "Go to " + confirmationLink + " to verify your email.")
                 .asString();
-        //System.out.println(request.getBody());
         return request.getBody();
-         */
-        return null;
     }
 }

@@ -47,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody User user) throws UnirestException {
+    public ResponseEntity<?> createUser(@RequestBody User user) throws Exception {
         try {
             authService.register(user);
             return ResponseEntity.ok("ok");
