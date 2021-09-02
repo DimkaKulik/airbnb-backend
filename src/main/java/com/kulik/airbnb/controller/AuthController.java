@@ -31,7 +31,7 @@ public class AuthController {
         if (token != null) {
             return ResponseEntity.ok(token);
         } else {
-            return new ResponseEntity<>("Invalid login/password combination", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Cannot login with such credentials", HttpStatus.FORBIDDEN);
         }
     }
 
@@ -48,12 +48,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@RequestBody User user) throws UnirestException {
-        String token = authService.register(user);
-
-        if (token != null) {
-            return ResponseEntity.ok(token);
-        } else {
-            return new ResponseEntity<>("Cannot register user", HttpStatus.FORBIDDEN);
+        try {
+            authService.register(user);
+            return ResponseEntity.ok("ok");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Registration error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

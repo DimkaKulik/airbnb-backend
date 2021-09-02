@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class UserDao implements Dao<User> {
@@ -23,6 +24,7 @@ public class UserDao implements Dao<User> {
     private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
+    private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmed FROM users WHERE email = (:email)";
     private static final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
     private static final String DELETE_USER_BY_EMAIL = "DELETE FROM users WHERE email = (:email)";
     private static final String UPDATE_USER = "UPDATE users SET "
@@ -82,24 +84,20 @@ public class UserDao implements Dao<User> {
 
     @Override
     public int create(User user) {
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource()
-                    .addValue("name", user.getName())
-                    .addValue("birth_date", user.getBirthDate())
-                    .addValue("gender", user.getGender())
-                    .addValue("avatar", user.getAvatar())
-                    .addValue("email", user.getEmail())
-                    .addValue("show_email", user.getShowEmail())
-                    .addValue("password", user.getPassword() == null
-                            ? null : passwordEncoder.encode(user.getPassword()))
-                    .addValue("description", user.getDescription());
-            final KeyHolder holder = new GeneratedKeyHolder();
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("name", user.getName())
+                .addValue("birth_date", user.getBirthDate())
+                .addValue("gender", user.getGender())
+                .addValue("avatar", user.getAvatar())
+                .addValue("email", user.getEmail())
+                .addValue("show_email", user.getShowEmail())
+                .addValue("password", user.getPassword() == null
+                        ? null : passwordEncoder.encode(user.getPassword()))
+                .addValue("description", user.getDescription());
+        final KeyHolder holder = new GeneratedKeyHolder();
 
-            jdbcTemplate.update(INSERT_USER, parameters, holder, new String[] {"id"});
-            return holder.getKey().intValue();
-        } catch (Exception e) {
-            return 0;
-        }
+        jdbcTemplate.update(INSERT_USER, parameters, holder, new String[] {"id"});
+        return holder.getKey().intValue();
     }
 
     @Override
@@ -150,5 +148,13 @@ public class UserDao implements Dao<User> {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("email", email);
         jdbcTemplate.update(CONFIRM_USER_ACCOUNT, parameters);
+    }
+
+    public int getConfirmationFlag(String email) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("email", email);
+        return jdbcTemplate.queryForObject(SELECT_USER_CONFIRMATION_BY_EMAIL, parameters, (rs, rowNum) ->
+                rs.getInt("confirmed"));
+
     }
 }

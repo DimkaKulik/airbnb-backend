@@ -8,6 +8,7 @@ import com.kulik.airbnb.security.JwtTokenProvider;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import io.jsonwebtoken.Jwt;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -34,27 +35,24 @@ public class AuthService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+            if (userDao.getConfirmationFlag(request.getEmail()) == 0) {
+                throw new Exception("Account is not confirmed");
+            }
+
             String token = jwtTokenProvider.createAuthorizationToken(request.getEmail());
 
             return token;
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public String register(User user) throws UnirestException {
-        int status = 0;
-
+    public void register(User user) throws UnirestException {
         if (user.getPassword() != null) {
-            status = userDao.create(user);
+            userDao.create(user);
         }
-
-        if (status > 0) {
-            sendConfirmationLink(user.getEmail());
-            return authenticate(new AuthRequest(user.getEmail(), user.getPassword()));
-        } else {
-            return null;
-        }
+        sendConfirmationLink(user.getEmail());
     }
 
     public void logout() { }
@@ -83,14 +81,19 @@ public class AuthService {
     }
 
     String sendConfirmationLink(String email) throws UnirestException {
+        String confirmationLink = "http://localhost:8080/users/confirmation?token=" + jwtTokenProvider.createConfirmationToken(email);
+        System.out.println(confirmationLink);
+        /*
         HttpResponse<String> request = Unirest.post("https://api.mailgun.net/v3/sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org/messages")
 			.basicAuth("api", "2a03404fdef9ef5e30423e69430bc346-156db0f1-76bec644")
                 .queryString("from", "Excited User <mailgun@sandboxd4339b515a1d43ac848095ed861325ed.mailgun.org>")
-                .queryString("to", "kulik.antitu@gmail.com")
-                .queryString("subject", "TEST MAILGUN")
-                .queryString("text", "Testing message from mailgun")
+                .queryString("to", email)
+                .queryString("subject", "Email verification")
+                .queryString("text", "Go to " + confirmationLink + " to verify your email.")
                 .asString();
-        System.out.println(request.getBody());
+        //System.out.println(request.getBody());
         return request.getBody();
+         */
+        return null;
     }
 }
