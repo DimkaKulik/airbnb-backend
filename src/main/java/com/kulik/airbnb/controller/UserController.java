@@ -61,17 +61,5 @@ public class UserController {
         }
     }
 
-
-
-
-    /*
-
-    TODO: make user account disable
-
-    @DeleteMapping("/")
-    ResponseEntity<?> deleteUser() {
-        return userService.deleteUser();
-    }
-     */
-
+    //TODO: make user account disabled
 }

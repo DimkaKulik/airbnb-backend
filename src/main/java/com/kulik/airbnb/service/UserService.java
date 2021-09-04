@@ -33,8 +33,10 @@ public class UserService {
     }
 
     public String confirmUser(String token) throws Exception {
-        if (jwtTokenProvider.validateToken(token)) {
-            userDao.confirm(jwtTokenProvider.getUsername(token));
+        String email = jwtTokenProvider.getUsername(token);
+
+        if (jwtTokenProvider.validateToken(token) && userDao.getConfirmationField(email).equals(token)) {
+            userDao.confirm(email);
             return "User successfully confirmed";
         } else {
             throw new Exception("invalid token");
@@ -60,5 +62,4 @@ public class UserService {
 
         return status;
     }
-
 }

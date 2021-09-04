@@ -8,6 +8,7 @@ import com.kulik.airbnb.security.JwtTokenProvider;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,10 +18,21 @@ import java.io.IOException;
 
 @Service
 public class AuthService {
+    private static final String CONFIRMATION_ENDPOINT = "/users/confirmation?token=";
+
     private final AuthenticationManager authenticationManager;
     private final GoogleOAuthClient googleOAuthClient;
     private final UserDao userDao;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${mailgun.endpoint}")
+    String MAILGUN_ENDPOINT;
+
+    @Value("${mailgun.api_key}")
+    String MAILGUN_API_KEY;
+
+    @Value("${domain}")
+    String DOMAIN;
 
     public AuthService(AuthenticationManager authenticationManager, GoogleOAuthClient googleOAuthClient, UserDao userDao, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
@@ -29,21 +41,18 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public String authenticate(AuthRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-
-            if (userDao.getConfirmationFlag(request.getEmail()) == 0) {
-                throw new Exception("Account is not confirmed");
-            }
-
-            String token = jwtTokenProvider.createAuthorizationToken(request.getEmail());
-
-            return token;
-        } catch (Exception e) {
-            return null;
+    public String authenticate(AuthRequest request) throws Exception {
+        userDao.getByEmail(request.getEmail());
+        if (!userDao.getConfirmationField(request.getEmail()).equals("confirmed")) {
+            throw new Exception("Account is not confirmed");
         }
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        String token = jwtTokenProvider.createAuthorizationToken(request.getEmail());
+
+        return token;
     }
 
     public void register(User user) throws Exception {
@@ -82,14 +91,18 @@ public class AuthService {
     }
 
     String sendConfirmationLink(String email) throws UnirestException {
-        String confirmationLink = "http://localhost:8080/users/confirmation?token=" + jwtTokenProvider.createConfirmationToken(email);
-        HttpResponse<String> request = Unirest.post("https://api.mailgun.net/v3/sandbox18addbc31e5d4a68ada7e2b6b4dd4237.mailgun.org/messages")
-			.basicAuth("api", "026241369f0f732cf5e0dbee7086f904-156db0f1-26d8978b")
+        String token = jwtTokenProvider.createConfirmationToken(email);
+        String confirmationLink = DOMAIN + CONFIRMATION_ENDPOINT + token;
+        userDao.insertConfirmationToken(email, token);
+
+        HttpResponse<String> request = Unirest.post(MAILGUN_ENDPOINT)
+			.basicAuth("api", MAILGUN_API_KEY)
                 .queryString("from", "Excited User <dzmitser.kulik@gmail.com>")
                 .queryString("to", email)
                 .queryString("subject", "Email verification")
                 .queryString("text", "Go to " + confirmationLink + " to verify your email.")
                 .asString();
+
         return request.getBody();
     }
 }

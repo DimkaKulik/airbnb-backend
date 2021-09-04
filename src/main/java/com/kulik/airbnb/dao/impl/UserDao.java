@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class UserDao implements Dao<User> {
@@ -24,7 +23,7 @@ public class UserDao implements Dao<User> {
     private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
-    private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmed FROM users WHERE email = (:email)";
+    private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmation FROM users WHERE email = (:email)";
     private static final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
     private static final String DELETE_USER_BY_EMAIL = "DELETE FROM users WHERE email = (:email)";
     private static final String UPDATE_USER = "UPDATE users SET "
@@ -32,7 +31,8 @@ public class UserDao implements Dao<User> {
             + "avatar = IFNULL(:avatar, avatar), email = IFNULL(:email, email), show_email = IFNULL(:show_email, show_email), "
             + "password = IFNULL(:password, password), description = IFNULL(:description, description) "
             + "WHERE id = :id";
-    private static final String CONFIRM_USER_ACCOUNT = "UPDATE users SET confirmed = true WHERE email = (:email)";
+    private static final String CONFIRM_USER_ACCOUNT = "UPDATE users SET confirmation = 'confirmed' WHERE email = (:email)";
+    private static final String UPDATE_USER_CONFIRMATION_TOKEN = "UPDATE users SET confirmation = (:token) WHERE email = (:email)";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
@@ -58,15 +58,11 @@ public class UserDao implements Dao<User> {
 
 
     public User getByEmail(String email) {
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource()
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("email", email);
 
-            return (User) jdbcTemplate.queryForObject(SELECT_USER_BY_EMAIL,
-                    parameters, new UserMapper());
-        } catch (Exception e) {
-            return null;
-        }
+        return (User) jdbcTemplate.queryForObject(SELECT_USER_BY_EMAIL,
+                parameters, new UserMapper());
     }
 
     @Override
@@ -150,11 +146,18 @@ public class UserDao implements Dao<User> {
         jdbcTemplate.update(CONFIRM_USER_ACCOUNT, parameters);
     }
 
-    public int getConfirmationFlag(String email) {
+    public String getConfirmationField(String email) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("email", email);
         return jdbcTemplate.queryForObject(SELECT_USER_CONFIRMATION_BY_EMAIL, parameters, (rs, rowNum) ->
-                rs.getInt("confirmed"));
+                rs.getString("confirmation"));
 
+    }
+
+    public void insertConfirmationToken(String email, String token) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("email", email)
+                .addValue("token", token);
+        jdbcTemplate.update(UPDATE_USER_CONFIRMATION_TOKEN, parameters);
     }
 }

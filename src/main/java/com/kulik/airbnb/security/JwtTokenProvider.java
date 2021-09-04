@@ -22,9 +22,9 @@ public class JwtTokenProvider {
     @Value("${jwt.header}")
     private String authorizationHeader;
     @Value("${jwt.authorization_token_expiration}")
-    private long AuthorizationTokenValidityInMilliseconds;
+    private long authorizationTokenValidityInMilliseconds;
     @Value("${jwt.confirmation_token_expiration}")
-    private long ConfirmationTokenValidityInMilliseconds;
+    private long confirmationTokenValidityInMilliseconds;
 
 
     public JwtTokenProvider(@Qualifier("JwtUserDetailsService") UserDetailsService userDetailsService) {
@@ -32,11 +32,11 @@ public class JwtTokenProvider {
     }
 
     public String createAuthorizationToken(String email) {
-        return createToken(email, AuthorizationTokenValidityInMilliseconds);
+        return createToken(email, authorizationTokenValidityInMilliseconds);
     }
 
     public String createConfirmationToken(String email) {
-        return createToken(email, ConfirmationTokenValidityInMilliseconds);
+        return createToken(email, confirmationTokenValidityInMilliseconds);
     }
 
     public boolean validateToken(String token) {
