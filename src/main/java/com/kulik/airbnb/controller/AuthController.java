@@ -6,7 +6,6 @@ import com.kulik.airbnb.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,13 +23,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        String token = authService.authenticate(request);
-
-        if (token != null) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) throws Exception {
+        try {
+            String token = authService.authenticate(request);
             return ResponseEntity.ok(token);
-        } else {
-            return new ResponseEntity<>("Invalid login/password combination", HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            // + e.getMessage() added for development purposes
+            return new ResponseEntity<>("Cannot login with such credentials : " + e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 
@@ -46,13 +45,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        String token = authService.register(user);
-
-        if (token != null) {
-            return ResponseEntity.ok(token);
-        } else {
-            return new ResponseEntity<>("Cannot register user", HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> createUser(@RequestBody User user) throws Exception {
+        try {
+            authService.register(user);
+            return ResponseEntity.ok("ok");
+        } catch (Exception e) {
+            // + e.getMessage() added for development purposes
+            return new ResponseEntity<>("Registration error : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

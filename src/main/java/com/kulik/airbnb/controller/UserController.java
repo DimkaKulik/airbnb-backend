@@ -19,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     ResponseEntity<?> getUsersPage(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
         List<User> users = userService.getPage(limit, offset);
 
@@ -41,7 +41,16 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/")
+    @GetMapping("/confirmation")
+    ResponseEntity<?> confirmUser(@RequestParam(value = "token", required = true) String token) {
+        try {
+            return ResponseEntity.ok(userService.confirmUser(token));
+        } catch(Exception e) {
+            return new ResponseEntity<>("Invalid confirmation link", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping
     ResponseEntity<?> updateUser(@RequestBody User updatedUser) {
         int status = userService.updateUser(updatedUser);
 
@@ -52,14 +61,5 @@ public class UserController {
         }
     }
 
-    /*
-
-    TODO: make user account disable
-
-    @DeleteMapping("/")
-    ResponseEntity<?> deleteUser() {
-        return userService.deleteUser();
-    }
-     */
-
+    //TODO: make user account disabled
 }

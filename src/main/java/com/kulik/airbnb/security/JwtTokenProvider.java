@@ -21,25 +21,22 @@ public class JwtTokenProvider {
     private String secretKey;
     @Value("${jwt.header}")
     private String authorizationHeader;
-    @Value("${jwt.expiration}")
-    private long validityInMilliseconds;
+    @Value("${jwt.authorization_token_expiration}")
+    private long authorizationTokenValidityInMilliseconds;
+    @Value("${jwt.confirmation_token_expiration}")
+    private long confirmationTokenValidityInMilliseconds;
+
 
     public JwtTokenProvider(@Qualifier("JwtUserDetailsService") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
-    public String createToken(String email) {
-        Claims claims = Jwts.claims().setSubject(email);
+    public String createAuthorizationToken(String email) {
+        return createToken(email, authorizationTokenValidityInMilliseconds);
+    }
 
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+    public String createConfirmationToken(String email) {
+        return createToken(email, confirmationTokenValidityInMilliseconds);
     }
 
     public boolean validateToken(String token) {
@@ -62,5 +59,20 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader(authorizationHeader);
+    }
+
+
+    private String createToken(String email, long validityInMilliseconds) {
+        Claims claims = Jwts.claims().setSubject(email);
+
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 }
