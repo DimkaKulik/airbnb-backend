@@ -1,7 +1,6 @@
 package com.kulik.airbnb.model;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class User {
