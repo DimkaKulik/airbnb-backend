@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class User {
-
     protected Long id;
     protected String name;
     protected GregorianCalendar birthDate;
