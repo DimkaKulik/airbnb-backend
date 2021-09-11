@@ -1,12 +1,12 @@
-package com.kulik.airbnb.dao.dto;
+package com.kulik.airbnb.model;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.GregorianCalendar;
 
-public class UserDto {
+public class User {
     protected Long id;
     protected String name;
-    protected Date birthDate;
+    protected GregorianCalendar birthDate;
     protected String gender;
     protected String avatar;
     protected String email;
@@ -16,10 +16,12 @@ public class UserDto {
     protected String description;
     protected Timestamp recordDate;
 
-    public UserDto(Long id, String name, Date birthDate, String gender,
-                   String avatar, String email, Boolean showEmail,
-                   String password, String role, String description,
-                   Timestamp recordDate) {
+    public User() {}
+
+    public User(Long id, String name, GregorianCalendar birthDate, String gender,
+                String avatar, String email, Boolean showEmail,
+                String password, String role, String description,
+                Timestamp recordDate) {
         this.id = id;
         this.name = name;
         this.birthDate = birthDate;
@@ -33,18 +35,18 @@ public class UserDto {
         this.recordDate = recordDate;
     }
 
-    public UserDto(UserDto userDto) {
-        id = userDto.id;
-        name = userDto.name;
-        birthDate = userDto.birthDate;
-        gender = userDto.gender;
-        avatar = userDto.avatar;
-        email = userDto.email;
-        showEmail = userDto.showEmail;
-        password = userDto.password;
-        role = userDto.role;
-        description = userDto.description;
-        recordDate = userDto.recordDate;
+    public User(User user) {
+        id = user.id;
+        name = user.name;
+        birthDate = user.birthDate;
+        gender = user.gender;
+        avatar = user.avatar;
+        email = user.email;
+        showEmail = user.showEmail;
+        password = user.password;
+        role = user.role;
+        description = user.description;
+        recordDate = user.recordDate;
     }
 
     public Long getId() {
@@ -75,7 +77,7 @@ public class UserDto {
         return showEmail;
     }
 
-    public Date getBirthDate() {
+    public GregorianCalendar getBirthDate() {
         return birthDate;
     }
 
@@ -119,7 +121,7 @@ public class UserDto {
         this.avatar = avatar;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(GregorianCalendar birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -135,23 +137,5 @@ public class UserDto {
         this.showEmail = showEmail;
     }
 
-    public void fixNullFields() {
-        if (getGender() == null) {
-            setGender("unknown");
-        }
-        if (getShowEmail() == null) {
-            setShowEmail(true);
-        }
-        if (getPassword() == null) {
-            setPassword(generateSecurePassword());
-        }
-        if (getRole() == null) {
-            setRole("ROLE_USER");
-        }
-    }
-
-    String generateSecurePassword() {
-        return "11111";
-    }
 }
 

@@ -1,74 +1,108 @@
 package com.kulik.airbnb.service;
 
-import com.kulik.airbnb.dao.GoogleOAuthDao;
-import com.kulik.airbnb.dao.dto.AuthRequestDto;
-import com.kulik.airbnb.dao.dto.UserDto;
+import com.kulik.airbnb.dao.GoogleOAuthClient;
+import com.kulik.airbnb.model.AuthRequest;
+import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Service
 public class AuthService {
+    private static final String CONFIRMATION_ENDPOINT = "/users/confirmation?token=";
+
     private final AuthenticationManager authenticationManager;
-    private final GoogleOAuthDao googleOAuthDao;
+    private final GoogleOAuthClient googleOAuthClient;
     private final UserDao userDao;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthService(AuthenticationManager authenticationManager, GoogleOAuthDao googleOAuthDao, UserDao userDao, JwtTokenProvider jwtTokenProvider) {
+    @Value("${mailgun.endpoint}")
+    String MAILGUN_ENDPOINT;
+
+    @Value("${mailgun.api_key}")
+    String MAILGUN_API_KEY;
+
+    @Value("${domain}")
+    String DOMAIN;
+
+    public AuthService(AuthenticationManager authenticationManager, GoogleOAuthClient googleOAuthClient, UserDao userDao, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
-        this.googleOAuthDao = googleOAuthDao;
+        this.googleOAuthClient = googleOAuthClient;
         this.userDao = userDao;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public ResponseEntity<?> authenticate(AuthRequestDto request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    public String authenticate(AuthRequest request) throws Exception {
+        userDao.getByEmail(request.getEmail());
+        if (!userDao.getConfirmationField(request.getEmail()).equals("confirmed")) {
+            throw new Exception("Account is not confirmed");
+        }
 
-            String token = jwtTokenProvider.createToken(request.getEmail());
-            return ResponseEntity.ok(token);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Invalid email/password combination", HttpStatus.FORBIDDEN);
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        String token = jwtTokenProvider.createAuthorizationToken(request.getEmail());
+
+        return token;
+    }
+
+    public void register(User user) throws Exception {
+        if (user.getPassword() == null) {
+            throw new Exception("Password cannot be null");
+        }
+
+        if (userDao.create(user) > 0) {
+            sendConfirmationLink(user.getEmail());
         }
     }
 
-    public ResponseEntity<?> register(UserDto userDto) {
-        userDto.setRole("ROLE_USER");
-        int status = userDao.create(userDto);
+    public void logout() { }
+
+    public String loginOrRegisterViaGoogle(String authorizationCode) throws IOException {
+        User userFromGoogle = googleOAuthClient.getUser(authorizationCode);
+        User userFromDatabase = userDao.getByEmail(userFromGoogle.getEmail());
+
+        int status = 0;
+        if (userFromDatabase == null) {
+            status = userDao.create(userFromGoogle);
+            userDao.confirm(userFromGoogle.getEmail());
+        } else {
+            status = 1;
+        }
 
         if (status > 0) {
-            return authenticate(new AuthRequestDto(userDto.getEmail(), userDto.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(userFromGoogle.getEmail(), ""));
+            String token = jwtTokenProvider.createAuthorizationToken(userFromGoogle.getEmail());
+
+            return token;
         } else {
-            return new ResponseEntity<>("Something went wrong, maybe such user already exists", HttpStatus.CONFLICT);
+            return null;
         }
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
-        securityContextLogoutHandler.logout(request, response, null);
+    String sendConfirmationLink(String email) throws UnirestException {
+        String token = jwtTokenProvider.createConfirmationToken(email);
+        String confirmationLink = DOMAIN + CONFIRMATION_ENDPOINT + token;
+        userDao.insertConfirmationToken(email, token);
+
+        HttpResponse<String> request = Unirest.post(MAILGUN_ENDPOINT)
+			.basicAuth("api", MAILGUN_API_KEY)
+                .queryString("from", "Excited User <dzmitser.kulik@gmail.com>")
+                .queryString("to", email)
+                .queryString("subject", "Email verification")
+                .queryString("text", "Go to " + confirmationLink + " to verify your email.")
+                .asString();
+
+        return request.getBody();
     }
-
-    public ResponseEntity<?> loginOrRegisterViaGoogle(String authorizationCode) throws IOException {
-        UserDto userFromGoogle = googleOAuthDao.getUser(authorizationCode);
-        UserDto userFromDatabase = userDao.getByEmail(userFromGoogle.getEmail());
-
-        if (userFromDatabase == null) {
-            userFromGoogle.fixNullFields();
-            return register(userFromGoogle);
-        } else {
-            return authenticate(new AuthRequestDto(userFromDatabase.getEmail(), userFromDatabase.getPassword()));
-        }
-    }
-
 }

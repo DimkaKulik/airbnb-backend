@@ -12,11 +12,11 @@
 
 - [x] Registration/Signing in
   - [x] Using JWT token
-  - [ ] Using third party services (Google, Github, etc.)
+  - [x] Using third party services (Google, Github, etc.)
 - [x] Restriction logic
 - [x] Authorization based on roles (role user, role admin)
-- [ ] User email confirmation
-  - [ ] Mailgun api
+- [x] User email confirmation
+  - [x] Mailgun api
 
 **2. Apartments offers**
  - [x] Creating, reading, updating, deleting (+ restriction logic)
