@@ -1,8 +1,10 @@
 package com.kulik.airbnb.dao.impl;
 
 import com.kulik.airbnb.dao.Dao;
+import com.kulik.airbnb.mapper.UserMapper;
 import com.kulik.airbnb.model.Product;
 import com.kulik.airbnb.mapper.ProductMapper;
+import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -23,6 +25,8 @@ public class ProductDao implements Dao<Product> {
     private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
     private static final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
             "ON products.users_id = users.id WHERE products.id = (:product_id)";
+    private static final String SELECT_USER_BY_PRODUCT_ID= "SELECT users.id, users.email FROM products CROSS JOIN users " +
+            "ON products.users_id = users.id WHERE products.id = (:product_id)";
     //TODO: select product by host email
     private static final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
     private static final String UPDATE_PRODUCT = "UPDATE products SET "
@@ -41,7 +45,7 @@ public class ProductDao implements Dao<Product> {
     }
 
     @Override
-    public Product getById(int id) {
+    public Product getById(Long id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                     .addValue("id", id);
@@ -73,6 +77,22 @@ public class ProductDao implements Dao<Product> {
 
             return jdbcTemplate.queryForObject(SELECT_USER_EMAIL_BY_PRODUCT_ID, parameters, (rs, rowNum) ->
                     rs.getString("email"));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public User getUserByProductId(Long productId) {
+        try {
+            MapSqlParameterSource parameters = new MapSqlParameterSource()
+                    .addValue("product_id", productId);
+
+            return (User) jdbcTemplate.queryForObject(SELECT_USER_BY_PRODUCT_ID, parameters, (rs, rowNum) -> {
+                User user = new User();
+                user.setId(rs.getLong("users.id"));
+                user.setEmail(rs.getString("users.email"));
+                return user;
+            });
         } catch (Exception e) {
             return null;
         }

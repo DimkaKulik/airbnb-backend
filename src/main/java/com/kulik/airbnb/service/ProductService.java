@@ -4,6 +4,7 @@ import com.kulik.airbnb.model.Product;
 import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.ProductDao;
 import com.kulik.airbnb.dao.impl.UserDao;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,9 @@ public class ProductService {
 
     private final UserDao userDao;
     private final ProductDao productDao;
+
+    @Value("${google_cloud_url}")
+    String googleCloudUrl;
 
     public ProductService(UserDao userDao, ProductDao productDao) {
         this.userDao = userDao;
@@ -26,13 +30,19 @@ public class ProductService {
         }
 
         List<Product> allProducts = productDao.getPage(limit, offset);
-
+        for (Product product : allProducts) {
+            if (product.getMainPhoto() != null) {
+                product.setMainPhoto(googleCloudUrl + product.getMainPhoto());
+            }
+        }
         return allProducts;
     }
 
-    public Product getProductById(int id) {
+    public Product getProductById(Long id) {
         Product product = productDao.getById(id);
-
+        if (product.getMainPhoto() != null) {
+            product.setMainPhoto(googleCloudUrl + product.getMainPhoto());
+        }
         return product;
     }
 

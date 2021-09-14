@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getUser(@PathVariable int id) {
+    ResponseEntity<?> getUser(@PathVariable Long id) {
         User user = userService.get(id);
 
         if (user != null) {
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/confirmation")
-    ResponseEntity<?> confirmUser(@RequestParam(value = "token", required = true) String token) {
+    ResponseEntity<?> confirmUser(@RequestParam(value = "token") String token) {
         try {
             return ResponseEntity.ok(userService.confirmUser(token));
         } catch(Exception e) {

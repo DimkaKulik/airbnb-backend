@@ -44,7 +44,7 @@ public class UserDao implements Dao<User> {
     }
 
     @Override
-    public User getById(int id) {
+    public User getById(Long id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", id);
