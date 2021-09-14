@@ -4,6 +4,7 @@ import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,9 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDao userDao;
 
+    @Value("${google_cloud_url}")
+    String googleCloudUrl;
+
     @Autowired
     public UserService(JwtTokenProvider jwtTokenProvider, UserDao userDao) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -24,11 +28,20 @@ public class UserService {
 
     public List<User> getPage(int limit, int offset) {
         List<User> users = userDao.getPage(limit, offset);
+        for (User user : users) {
+            if (user.getAvatar() != null && !user.getAvatar().substring(0, 4).equals("http")) {
+                user.setAvatar(googleCloudUrl + user.getAvatar());
+            }
+        }
+
         return users;
     }
 
     public User get(int id) {
         User user = userDao.getById(id);
+        if (!user.getAvatar().substring(0, 3).equals("http")) {
+            user.setAvatar(googleCloudUrl + user.getAvatar());
+        }
         return user;
     }
 

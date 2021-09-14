@@ -20,7 +20,8 @@ public class UserController {
     }
 
     @GetMapping
-    ResponseEntity<?> getUsersPage(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+    ResponseEntity<?> getUsersPage(@RequestParam(value = "limit", required = false, defaultValue = "100") int limit,
+                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
         List<User> users = userService.getPage(limit, offset);
 
         if (users != null) {
