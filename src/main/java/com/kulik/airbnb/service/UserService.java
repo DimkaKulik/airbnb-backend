@@ -39,7 +39,7 @@ public class UserService {
 
     public User get(int id) {
         User user = userDao.getById(id);
-        if (!user.getAvatar().substring(0, 3).equals("http")) {
+        if (user.getAvatar() != null && !user.getAvatar().substring(0, 3).equals("http")) {
             user.setAvatar(googleCloudUrl + user.getAvatar());
         }
         return user;
