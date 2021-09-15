@@ -93,6 +93,11 @@
             <artifactId>flyway-core</artifactId>
             <version>7.15.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.11</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

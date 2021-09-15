@@ -7,11 +7,16 @@ import com.kulik.airbnb.dao.impl.ProductPhotoDao;
 import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.model.Product;
 import com.kulik.airbnb.model.User;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +24,9 @@ import java.util.UUID;
 
 @Service
 public class ImageService {
+
+    private static final int PHOTO_WIDTH = 800;
+    private static final int PHOTO_HEIGHT = 800;
 
     private final Storage storage;
     private final UserDao userDao;
@@ -57,6 +65,8 @@ public class ImageService {
     }
 
     public void uploadPhoto(MultipartFile file, Long id) throws Exception {
+        byte[] image = cropImage(file);
+
         User productHost = productDao.getUserByProductId(id);
         if (productHost.getEmail().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && productPhotoDao.getPhotosByProductId(id) != null
@@ -64,7 +74,7 @@ public class ImageService {
             String filename = id + "_" + UUID.randomUUID() + ".png";
             storage.create(
                     BlobInfo.newBuilder(productPhotoBucket, filename).build(),
-                    file.getBytes()
+                    image
             );
 
             Product product = productDao.getById(id);
@@ -78,10 +88,6 @@ public class ImageService {
         }
     }
 
-    MultipartFile cropImage(MultipartFile file) {
-        return file;
-    }
-
     public List<String> getPhotos(Long id) {
         List<String> rawPhotosUrls = productPhotoDao.getPhotosByProductId(id);
         List<String> photoUrls = new ArrayList<>();
@@ -89,5 +95,16 @@ public class ImageService {
             photoUrls.add(googleCloudUrl + rawPhotoUrl);
         }
         return photoUrls;
+    }
+
+    byte[] cropImage(MultipartFile file) throws IOException {
+        BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Thumbnails.of(originalImage)
+                .size(PHOTO_WIDTH, PHOTO_HEIGHT)
+                .outputFormat("png")
+                .outputQuality(1)
+                .toOutputStream(outputStream);
+        return outputStream.toByteArray();
     }
 }
