@@ -103,7 +103,7 @@ public class ImageService {
         Thumbnails.of(originalImage)
                 .size(PHOTO_WIDTH, PHOTO_HEIGHT)
                 .outputFormat("png")
-                .outputQuality(1)
+                .outputQuality(0.1)
                 .toOutputStream(outputStream);
         return outputStream.toByteArray();
     }
