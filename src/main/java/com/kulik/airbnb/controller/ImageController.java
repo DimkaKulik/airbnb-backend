@@ -18,7 +18,7 @@ public class ImageController {
     }
 
     @GetMapping("/product/{id}")
-    ResponseEntity<?> uploadProductPhoto(@PathVariable("id") Long id) {
+    ResponseEntity<?> getProductPhoto(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(imageService.getPhotos(id));
         } catch (Exception e) {
