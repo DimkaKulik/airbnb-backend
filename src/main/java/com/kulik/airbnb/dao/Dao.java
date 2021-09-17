@@ -5,7 +5,7 @@ import java.util.List;
 public interface Dao<T> {
     List<T> getPage(int limit, int offset);
 
-    T getById(int id);
+    T getById(Long id);
 
     int create(T t);
 

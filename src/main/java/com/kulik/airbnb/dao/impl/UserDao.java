@@ -20,7 +20,7 @@ public class UserDao implements Dao<User> {
             + "show_email, password, description) "
             + "VALUES (:name, :birth_date, :gender, :avatar, :email, :show_email, "
             + ":password, :description)";
-    private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT (:limit) OFFSET (:offset)";
+    private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT :limit OFFSET :offset";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
     private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmation FROM users WHERE email = (:email)";
@@ -44,7 +44,7 @@ public class UserDao implements Dao<User> {
     }
 
     @Override
-    public User getById(int id) {
+    public User getById(Long id) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", id);
@@ -60,9 +60,12 @@ public class UserDao implements Dao<User> {
     public User getByEmail(String email) {
         MapSqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("email", email);
-
-        return (User) jdbcTemplate.queryForObject(SELECT_USER_BY_EMAIL,
-                parameters, new UserMapper());
+        try {
+            return (User) jdbcTemplate.queryForObject(SELECT_USER_BY_EMAIL,
+                    parameters, new UserMapper());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

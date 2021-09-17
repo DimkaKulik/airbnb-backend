@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) throws Exception {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             String token = authService.authenticate(request);
             return ResponseEntity.ok(token);
@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestBody User user) throws Exception {
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         try {
             authService.register(user);
             return ResponseEntity.ok("ok");

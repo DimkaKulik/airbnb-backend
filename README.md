@@ -24,10 +24,10 @@
  - [ ] Use of third party services for maps
  - [ ] Use of third party api for currency converter
  
-**3. Working with files**
-  - [ ] Working with photos 
-    - [ ] User avatars
-    - [ ] Apartments offers photos
+**3. File management**
+  - [x] Image processing 
+    - [x] User avatars
+    - [x] Photos of apartment offers
 
 
 **4. Chat and notifications**
