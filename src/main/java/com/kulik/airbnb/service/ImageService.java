@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.imageio.ImageIO;
+
 
 @Service
 public class ImageService {
@@ -83,8 +84,8 @@ public class ImageService {
 
             productPhotoDao.createPhoto(id, productHost.getId(), "/" + productPhotoBucket + "/" + filename);
         } else {
-            throw new Exception("Uploading photo to product you haven't created or " +
-                    "uploading more than 10 photos not allowed");
+            throw new Exception("Uploading photo to product you haven't created or "
+                    + "uploading more than 10 photos not allowed");
         }
     }
 

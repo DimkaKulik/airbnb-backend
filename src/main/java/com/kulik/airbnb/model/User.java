@@ -16,7 +16,9 @@ public class User {
     protected String description;
     protected Timestamp recordDate;
 
-    public User() {}
+    public User() {
+
+    }
 
     public User(Long id, String name, GregorianCalendar birthDate, String gender,
                 String avatar, String email, Boolean showEmail,

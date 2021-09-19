@@ -1,9 +1,9 @@
 package com.kulik.airbnb.service;
 
+import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.dao.GoogleOAuthClient;
 import com.kulik.airbnb.model.AuthRequest;
 import com.kulik.airbnb.model.User;
-import com.kulik.airbnb.dao.impl.UserDao;
 import com.kulik.airbnb.security.JwtTokenProvider;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -26,15 +26,16 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${mailgun.endpoint}")
-    String MAILGUN_ENDPOINT;
+    String mailgunEndpoint;
 
     @Value("${mailgun.api_key}")
-    String MAILGUN_API_KEY;
+    String mailgunApiKey;
 
     @Value("${domain}")
-    String DOMAIN;
+    String domain;
 
-    public AuthService(AuthenticationManager authenticationManager, GoogleOAuthClient googleOAuthClient, UserDao userDao, JwtTokenProvider jwtTokenProvider) {
+    public AuthService(AuthenticationManager authenticationManager, GoogleOAuthClient googleOAuthClient,
+                       UserDao userDao, JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.googleOAuthClient = googleOAuthClient;
         this.userDao = userDao;
@@ -65,7 +66,9 @@ public class AuthService {
         }
     }
 
-    public void logout() { }
+    public void logout() {
+
+    }
 
     public String loginOrRegisterViaGoogle(String authorizationCode) throws IOException {
         User userFromGoogle = googleOAuthClient.getUser(authorizationCode);
@@ -92,11 +95,11 @@ public class AuthService {
 
     String sendConfirmationLink(String email) throws UnirestException {
         String token = jwtTokenProvider.createConfirmationToken(email);
-        String confirmationLink = DOMAIN + CONFIRMATION_ENDPOINT + token;
+        String confirmationLink = domain + CONFIRMATION_ENDPOINT + token;
         userDao.insertConfirmationToken(email, token);
 
-        HttpResponse<String> request = Unirest.post(MAILGUN_ENDPOINT)
-			.basicAuth("api", MAILGUN_API_KEY)
+        HttpResponse<String> request = Unirest.post(mailgunEndpoint)
+			.basicAuth("api", mailgunApiKey)
                 .queryString("from", "Excited User <dzmitser.kulik@gmail.com>")
                 .queryString("to", email)
                 .queryString("subject", "Email verification")

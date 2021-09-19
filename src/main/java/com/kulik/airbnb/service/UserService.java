@@ -1,13 +1,12 @@
 package com.kulik.airbnb.service;
 
-import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.UserDao;
+import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class UserService {
         }
     }
 
-    public int updateUser(@RequestBody User updatedUser) {
+    public int updateUser(User updatedUser) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User authenticatedUser = userDao.getByEmail(email);

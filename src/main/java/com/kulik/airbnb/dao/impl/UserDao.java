@@ -1,16 +1,16 @@
 package com.kulik.airbnb.dao.impl;
 
 import com.kulik.airbnb.dao.Dao;
-import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.mapper.UserMapper;
+import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.List;
 
@@ -23,16 +23,19 @@ public class UserDao implements Dao<User> {
     private static final String SELECT_USERS_PAGE = "SELECT * FROM users LIMIT :limit OFFSET :offset";
     private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = (:id)";
     private static final String SELECT_USER_BY_EMAIL = "SELECT * FROM users WHERE email = (:email)";
-    private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmation FROM users WHERE email = (:email)";
+    private static final String SELECT_USER_CONFIRMATION_BY_EMAIL = "SELECT confirmation FROM users WHERE "
+            + "email = (:email)";
     private static final String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = (:id)";
     private static final String DELETE_USER_BY_EMAIL = "DELETE FROM users WHERE email = (:email)";
     private static final String UPDATE_USER = "UPDATE users SET "
-            + "name = IFNULL(:name, name) , birth_date = IFNULL(:birth_date, birth_date), gender = IFNULL(:gender, gender), "
-            + "avatar = IFNULL(:avatar, avatar), email = IFNULL(:email, email), show_email = IFNULL(:show_email, show_email), "
-            + "password = IFNULL(:password, password), description = IFNULL(:description, description) "
-            + "WHERE id = :id";
-    private static final String CONFIRM_USER_ACCOUNT = "UPDATE users SET confirmation = 'confirmed' WHERE email = (:email)";
-    private static final String UPDATE_USER_CONFIRMATION_TOKEN = "UPDATE users SET confirmation = (:token) WHERE email = (:email)";
+            + "name = IFNULL(:name, name) , birth_date = IFNULL(:birth_date, birth_date), "
+            + "gender = IFNULL(:gender, gender), avatar = IFNULL(:avatar, avatar), email = IFNULL(:email, email), "
+            + "show_email = IFNULL(:show_email, show_email), password = IFNULL(:password, password), "
+            + "description = IFNULL(:description, description) WHERE id = :id";
+    private static final String CONFIRM_USER_ACCOUNT = "UPDATE users SET confirmation = 'confirmed' WHERE "
+            + "email = (:email)";
+    private static final String UPDATE_USER_CONFIRMATION_TOKEN = "UPDATE users SET confirmation = (:token) WHERE "
+            + "email = (:email)";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;

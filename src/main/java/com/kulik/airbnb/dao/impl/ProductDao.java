@@ -1,9 +1,8 @@
 package com.kulik.airbnb.dao.impl;
 
 import com.kulik.airbnb.dao.Dao;
-import com.kulik.airbnb.mapper.UserMapper;
-import com.kulik.airbnb.model.Product;
 import com.kulik.airbnb.mapper.ProductMapper;
+import com.kulik.airbnb.model.Product;
 import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,16 +16,16 @@ import java.util.List;
 @Component
 public class ProductDao implements Dao<Product> {
 
-    private static final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, wifi, "
-            + "parking, pool, conditioner, extinguisher, smoke_detector, description) "
+    private static final String INSERT_PRODUCT = "INSERT INTO products (users_id, main_photo, type, full, address, "
+            + "wifi, parking, pool, conditioner, extinguisher, smoke_detector, description) "
             + "VALUES (:users_id, :main_photo, :type, :full, :address, :wifi, :parking, "
             + ":pool, :conditioner, :extinguisher, :smoke_detector, :description)";
     private static final String SELECT_PRODUCTS_PAGE = "SELECT * FROM products LIMIT :limit OFFSET :offset";
     private static final String SELECT_PRODUCT_BY_ID = "SELECT * FROM products WHERE id = (:id)";
-    private static final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users " +
-            "ON products.users_id = users.id WHERE products.id = (:product_id)";
-    private static final String SELECT_USER_BY_PRODUCT_ID= "SELECT users.id, users.email FROM products CROSS JOIN users " +
-            "ON products.users_id = users.id WHERE products.id = (:product_id)";
+    private static final String SELECT_USER_EMAIL_BY_PRODUCT_ID = "SELECT email FROM products CROSS JOIN users "
+            + "ON products.users_id = users.id WHERE products.id = (:product_id)";
+    private static final String SELECT_USER_BY_PRODUCT_ID = "SELECT users.id, users.email FROM products CROSS JOIN "
+            + "users ON products.users_id = users.id WHERE products.id = (:product_id)";
     //TODO: select product by host email
     private static final String DELETE_PRODUCT_BY_ID = "DELETE FROM products WHERE id = (:id)";
     private static final String UPDATE_PRODUCT = "UPDATE products SET "
@@ -34,7 +33,8 @@ public class ProductDao implements Dao<Product> {
             + "type = IFNULL(:type, type), full = IFNULL(:full, full), "
             + "address = IFNULL(:address, address), parking = IFNULL(:parking, parking), pool = IFNULL(:pool, pool), "
             + "conditioner = IFNULL(:conditioner, conditioner), extinguisher = IFNULL(:extinguisher, extinguisher), "
-            + "smoke_detector = IFNULL(:smoke_detector, smoke_detector), description = IFNULL(:description, description), "
+            + "smoke_detector = IFNULL(:smoke_detector, smoke_detector), "
+            + "description = IFNULL(:description, description), "
             + "approved = IFNULL(:approved, approved) WHERE id = :id";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -117,7 +117,7 @@ public class ProductDao implements Dao<Product> {
                     .addValue("approved", product.getApproved());
             final KeyHolder holder = new GeneratedKeyHolder();
 
-            jdbcTemplate.update(INSERT_PRODUCT, parameters, holder, new String[] {"id"});
+            jdbcTemplate.update(INSERT_PRODUCT, parameters, holder, new String[]{"id"});
             return holder.getKey().intValue();
         } catch (Exception e) {
             return 0;
@@ -129,20 +129,20 @@ public class ProductDao implements Dao<Product> {
     public int update(Product product) {
         try {
             MapSqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", product.getId())
-                .addValue("users_id", product.getUsersId())
-                .addValue("main_photo", product.getMainPhoto())
-                .addValue("type", product.getType())
-                .addValue("full", product.getFull())
-                .addValue("address", product.getAddress())
-                .addValue("wifi", product.getWifi())
-                .addValue("parking", product.getParking())
-                .addValue("pool", product.getPool())
-                .addValue("conditioner", product.getConditioner())
-                .addValue("extinguisher", product.getExtinguisher())
-                .addValue("smoke_detector", product.getSmokeDetector())
-                .addValue("description", product.getDescription())
-                .addValue("approved", product.getApproved());
+                    .addValue("id", product.getId())
+                    .addValue("users_id", product.getUsersId())
+                    .addValue("main_photo", product.getMainPhoto())
+                    .addValue("type", product.getType())
+                    .addValue("full", product.getFull())
+                    .addValue("address", product.getAddress())
+                    .addValue("wifi", product.getWifi())
+                    .addValue("parking", product.getParking())
+                    .addValue("pool", product.getPool())
+                    .addValue("conditioner", product.getConditioner())
+                    .addValue("extinguisher", product.getExtinguisher())
+                    .addValue("smoke_detector", product.getSmokeDetector())
+                    .addValue("description", product.getDescription())
+                    .addValue("approved", product.getApproved());
 
             return jdbcTemplate.update(UPDATE_PRODUCT, parameters);
         } catch (Exception e) {

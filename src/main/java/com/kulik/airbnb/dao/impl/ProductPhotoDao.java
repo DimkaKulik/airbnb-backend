@@ -9,8 +9,8 @@ import java.util.List;
 @Component
 public class ProductPhotoDao {
     private static final String SELECT_PHOTOS_URLS_BY_PRODUCT_ID = "SELECT url FROM photos WHERE products_id = :id";
-    private static final String INSERT_PHOTO = "INSERT INTO photos (products_id, users_id, url) " +
-            "VALUES (:products_id, :users_id, :url)";
+    private static final String INSERT_PHOTO = "INSERT INTO photos (products_id, users_id, url) "
+            + "VALUES (:products_id, :users_id, :url)";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 

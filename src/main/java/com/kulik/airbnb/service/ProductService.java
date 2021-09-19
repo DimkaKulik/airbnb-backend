@@ -1,9 +1,9 @@
 package com.kulik.airbnb.service;
 
 import com.kulik.airbnb.model.Product;
-import com.kulik.airbnb.model.User;
 import com.kulik.airbnb.dao.impl.ProductDao;
 import com.kulik.airbnb.dao.impl.UserDao;
+import com.kulik.airbnb.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
