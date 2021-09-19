@@ -34,19 +34,19 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Check codestyle
         run: mvn checkstyle:check
-      - name: Check for PMD violations
-        run: mvn pmd:check
-      - name: Check for CPD violations
-        run: mvn pmd:cpd-check
-      - name: Build with Maven
-        run: mvn --batch-mode verify
-      - name: Run SpotBugs static analysis
-        run: mvn spotbugs:check
-      - name: Check coverage and mutation
-        run: mvn pitest:mutationCoverage
-      - name: Status check
-        if: always()
-        uses: ouzi-dev/commit-status-updater@v1.1.2
-        with:
-          addHoldComment: "true"
-          status: "${{ job.status }}"
+#      - name: Check for PMD violations
+#        run: mvn pmd:check
+#      - name: Check for CPD violations
+#        run: mvn pmd:cpd-check
+#      - name: Build with Maven
+#        run: mvn --batch-mode verify
+#      - name: Run SpotBugs static analysis
+#        run: mvn spotbugs:check
+#      - name: Check coverage and mutation
+#        run: mvn pitest:mutationCoverage
+#      - name: Status check
+#        if: always()
+#        uses: ouzi-dev/commit-status-updater@v1.1.2
+#        with:
+#          addHoldComment: "true"
+#          status: "${{ job.status }}"
