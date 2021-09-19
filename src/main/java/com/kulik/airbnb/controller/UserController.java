@@ -20,10 +20,6 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    void METHODTOFAILCHEC(){
-
-    }
-
     private final UserService userService;
 
     UserController(UserService userService) {
