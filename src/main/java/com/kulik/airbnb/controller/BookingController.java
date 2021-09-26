@@ -21,12 +21,12 @@ public class BookingController {
 
     @PostMapping
     ResponseEntity<?> createNewBook(@RequestBody Booking booking) {
-        try {
+        //try {
             bookingService.createBooking(booking);
             return ResponseEntity.ok("You have successfully booked your hut.");
-        } catch (Exception e) {
-            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        //} catch (Exception e) {
+         //   return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        //}
     }
 
     @GetMapping("/history")

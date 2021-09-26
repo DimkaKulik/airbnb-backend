@@ -10,5 +10,6 @@ CREATE TABLE `booking`
     PRIMARY KEY (`id`),
     UNIQUE KEY `one_product_has_one_client_UNIQUE` (`products_id`,`start`),
     KEY           `fk_booking` (`products_id`,`users_id`),
-    CONSTRAINT `fk_booking` FOREIGN KEY (`products_id`, `users_id`) REFERENCES `products` (`id`, `users_id`)
+    CONSTRAINT `fk_booking_products` FOREIGN KEY (`products_id`) REFERENCES `products` (`id`),
+    CONSTRAINT `fk_booking_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
 );
