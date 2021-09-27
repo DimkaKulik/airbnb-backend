@@ -12,7 +12,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     private final UserDao userDao;
 
     @Autowired
-    JwtUserDetailsService(UserDao userDao) {
+    public JwtUserDetailsService(UserDao userDao) {
         this.userDao = userDao;
     }
 

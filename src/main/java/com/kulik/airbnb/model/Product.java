@@ -16,6 +16,10 @@ public class Product {
     protected String description;
     protected Boolean approved;
 
+    public Product() {
+
+    }
+
     public Product(Long id, Long usersId, String mainPhoto, String type, Boolean full,
                    String address, Boolean wifi, Boolean parking, Boolean pool,
                    Boolean conditioner, Boolean extinguisher, Boolean smokeDetector,
