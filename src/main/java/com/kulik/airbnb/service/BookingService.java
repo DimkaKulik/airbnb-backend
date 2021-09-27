@@ -28,7 +28,7 @@ public class BookingService {
         bookingDao.insertBooking(booking);
     }
 
-    public List<Booking> getBookingHistory(int limit, int offset) {
+    public List<Booking> getUserBookingHistory(int limit, int offset) {
         if (limit > LIMIT) {
             limit = LIMIT;
         }
@@ -37,6 +37,14 @@ public class BookingService {
         User authenticatedUser = userDao.getByEmail(authenticatedUserEmail);
 
         return bookingDao.getUserBookingsPage(Math.toIntExact(authenticatedUser.getId()), limit, offset);
+    }
+
+    public List<Booking> getProductBookingHistory(int id, int limit, int offset) {
+        if (limit > LIMIT) {
+            limit = LIMIT;
+        }
+
+        return bookingDao.getProductBookingsPage(id, limit, offset);
     }
 
     public void deleteBooking(int bookingId) throws Exception {

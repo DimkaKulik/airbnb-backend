@@ -11,7 +11,9 @@ import java.util.List;
 @Component
 public class BookingDao {
     private static final String SELECT_BOOKING_BY_ID = "SELECT * FROM booking WHERE id = :id";
-    private static final String SELECT_USERS_BOOKINGS = "SELECT * FROM booking WHERE users_id = :user_id "
+    private static final String SELECT_USER_BOOKINGS = "SELECT * FROM booking WHERE users_id = :user_id "
+            + "LIMIT :limit OFFSET :offset";
+    private static final String SELECT_PRODUCT_BOOKINGS = "SELECT * FROM booking WHERE products_id = :id "
             + "LIMIT :limit OFFSET :offset";
     private static final String INSERT_BOOKING = "INSERT INTO booking (id, products_id, users_id, start, finish, "
             + "description) VALUES (:id, :products_id, :users_id, :start, :finish, :description)";
@@ -28,8 +30,15 @@ public class BookingDao {
                 .addValue("user_id", userId)
                 .addValue("limit", limit)
                 .addValue("offset", offset);
+        return jdbcTemplate.query(SELECT_USER_BOOKINGS, parameters, new BookingMapper());
+    }
 
-        return jdbcTemplate.query(SELECT_USERS_BOOKINGS, parameters, new BookingMapper());
+    public List<Booking> getProductBookingsPage(int id, int limit, int offset) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("limit", limit)
+                .addValue("offset", offset);
+        return jdbcTemplate.query(SELECT_PRODUCT_BOOKINGS, parameters, new BookingMapper());
     }
 
     public Booking getBookingById(int id) {

@@ -21,21 +21,35 @@ public class BookingController {
 
     @PostMapping
     ResponseEntity<?> createNewBook(@RequestBody Booking booking) {
-        //try {
+        try {
             bookingService.createBooking(booking);
             return ResponseEntity.ok("You have successfully booked your hut.");
-        //} catch (Exception e) {
-         //   return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
-        //}
+        } catch (Exception e) {
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/history")
-    ResponseEntity<?> getBookingHistory(@RequestParam(value = "limit", required = false, defaultValue = "100")
-                                                int limit,
-                                        @RequestParam(value = "offset", required = false, defaultValue = "0")
-                                                int offset) {
+    ResponseEntity<?> getUserBookingHistory(@RequestParam(value = "limit", required = false, defaultValue = "100")
+                                                    int limit,
+                                            @RequestParam(value = "offset", required = false, defaultValue = "0")
+                                                    int offset) {
         try {
-            List<Booking> history = bookingService.getBookingHistory(limit, offset);
+            List<Booking> history = bookingService.getUserBookingHistory(limit, offset);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<?> getProductBookingHistory(@PathVariable("id") int id,
+                                               @RequestParam(value = "limit", required = false, defaultValue = "100")
+                                                       int limit,
+                                               @RequestParam(value = "offset", required = false, defaultValue = "0")
+                                                       int offset) {
+        try {
+            List<Booking> history = bookingService.getProductBookingHistory(id, limit, offset);
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
