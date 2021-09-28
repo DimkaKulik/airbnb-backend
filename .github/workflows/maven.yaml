@@ -39,11 +39,11 @@ jobs:
 #      - name: Check for CPD violations
 #        run: mvn pmd:cpd-check
       - name: Build with Maven
-        run: mvn --batch-mode verify
+        run: mvn -DJWT_SECRET=jwt_secret -DGOOGLE_CLIENT_ID=google_client_id -DGOOGLE_CLIENT_SECRET=google_client_secret -DMAILGUN_API_KEY=mailgun_api_key -DMAILGUN_ENDPOINT=mailgun_endpoint -B verify
 #      - name: Run SpotBugs static analysis
 #        run: mvn spotbugs:check
-      - name: Check coverage and mutation
-        run: mvn pitest:mutationCoverage
+#      - name: Check coverage and mutation
+#        run: mvn pitest:mutationCoverage
       - name: Status check
         if: always()
         uses: ouzi-dev/commit-status-updater@v1.1.2
