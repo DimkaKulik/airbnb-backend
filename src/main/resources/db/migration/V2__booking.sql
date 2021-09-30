@@ -13,3 +13,4 @@ CREATE TABLE `booking`
     CONSTRAINT `fk_booking_products` FOREIGN KEY (`products_id`) REFERENCES `products` (`id`),
     CONSTRAINT `fk_booking_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`)
 );
+
