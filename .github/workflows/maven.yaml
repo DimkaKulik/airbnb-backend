@@ -13,6 +13,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
+
 
     steps:
       - name: Pending status
@@ -38,15 +40,22 @@ jobs:
 #        run: mvn pmd:check
 #      - name: Check for CPD violations
 #        run: mvn pmd:cpd-check
-#      - name: Build with Maven
-#        run: mvn --batch-mode verify
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'airbnb' # Optional, default value is "test". The specified database which will be create
+          mysql root password: 'Immanuel1724!' #${{ secrets.RootPassword }} # Required if "mysql user" is empty, default is empty. The root superuser password
+#          mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+#          mysql password: ${{ secrets.DatabasePassword }} # Required if "mysql user" exists. The password for the "mysql user"
+
+      - name: Build with Maven
+        run: mvn -DJWT_SECRET=jwt_secret -DGOOGLE_CLIENT_ID=google_client_id -DGOOGLE_CLIENT_SECRET=google_client_secret -DMAILGUN_API_KEY=mailgun_api_key -DMAILGUN_ENDPOINT=mailgun_endpoint -B verify
 #      - name: Run SpotBugs static analysis
 #        run: mvn spotbugs:check
 #      - name: Check coverage and mutation
 #        run: mvn pitest:mutationCoverage
-#      - name: Status check
-#        if: always()
-#        uses: ouzi-dev/commit-status-updater@v1.1.2
-#        with:
-#          addHoldComment: "true"
-#          status: "${{ job.status }}"
+      - name: Status check
+        if: always()
+        uses: ouzi-dev/commit-status-updater@v1.1.2
+        with:
+          addHoldComment: "true"
+          status: "${{ job.status }}"
